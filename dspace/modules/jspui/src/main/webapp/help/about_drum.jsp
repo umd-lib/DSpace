@@ -51,7 +51,7 @@
 
 <h2>Increase the visibility and impact of your research</h2>
 
-<p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent URL for each submission that other researchers can use to cite your work.</p>
+<p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent DOI for each submission that other researchers can use to cite your work.</p>
 
 <p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. <a href=" ">How to submit<a>.</p>
 
@@ -59,7 +59,7 @@
 
 <p>You can use DRUM to ensure the long-term preservation of your research products. The University Libraries intend to preserve all your submissions indefinitely, and we’ll maintain your material even if you leave the university.</p>
 
-<p>DRUM is built on <a href="http://www.dspace.org">DSpace software</a>, a widely used, reliable digital repository platform. DRUM performs nightly bit-level integrity tests on all files.  DRUM conforms to the digital preservation principles outlined in the University of Maryland Libraries’ <a href="http://drum.lib.umd.edu/handle/1903/14745">Digital Preservation Policy</a>. 
+<p>DRUM is built on <a href="http://www.dspace.org">DSpace software</a>, a widely used, reliable digital repository platform. DRUM performs nightly bit-level integrity tests on all files. DRUM conforms to the digital preservation principles outlined in the University of Maryland Libraries’ <a href="http://drum.lib.umd.edu/handle/1903/14745">Digital Preservation Policy</a>. 
 </p>
 
 <p>The University of Maryland Libraries reserve the right to migrate your materials to new file formats to reduce the risk of technological obsolescence. However, we cannot guarantee that we will migrate any or all materials in the repository.</p>
