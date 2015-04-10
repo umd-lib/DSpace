@@ -7,6 +7,7 @@
  */
 importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
+importClass(Packages.java.lang.Integer);
 
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
@@ -33,6 +34,10 @@ importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
 importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
+
+importClass(Packages.org.dspace.app.xmlui.vivian.ReadBack);
+
+importClass(Packages.org.dspace.content.Collection);
 
 /* Global variable which stores a comma-separated list of all fields 
  * which errored out during processing of the last step.
@@ -149,10 +154,13 @@ function doSubmission()
    var step = cocoon.request.get("step"); //retrieve step number
    
    var workspaceID = cocoon.request.get("workspaceID");
+   //var workspace;
    
    if (workspaceID == null)
    {
        var handle = cocoon.parameters["handle"];
+       var handle_list = 0;
+
        if (handle == null)
            handle = cocoon.request.get("handle");
        
@@ -160,6 +168,18 @@ function doSubmission()
        do {
            if (handle != null)
            {
+               ReadBack.showString(handle);
+
+               if (handle.toString().charAt(0)==91){
+                   // Handles the case where there are multiple collections selected for the submission.
+                   // Passed in as handle=[handle1, handle2, handle3]
+                   var temp = handle.toString().slice(1,-1); // In order to remove the braces.
+                   handle_list=temp.split(", "); //Splits the handles to an array of handles.
+                   handle = handle_list[0];
+                   ReadBack.showString(handle);
+                   ReadBack.showString(handle_list);
+               }
+
                var dso = HandleManager.resolveToObject(getDSContext(), handle);
                
                // Check that the dso is a collection
@@ -170,6 +190,7 @@ function doSubmission()
                    {
                        // Construct a new workspace for this submission.
                        var workspace = WorkspaceItem.create(getDSContext(), dso, true);
+                       //var workspace = WorkspaceItem.create(getDSContext(), Collection.find(getDSContext(),dso.getID()), true);
                        workspaceID = workspace.getID();
                        
                        collectionSelected = true;
@@ -185,9 +206,16 @@ function doSubmission()
                      
        } while (collectionSelected == false)
       
+       if(handle_list != 0){
+           for (var i=1;i<handle_list.length;i++) {
+               var workspace = WorkspaceItem.find(getDSContext(), workspaceID);
+               workspace.addMapCollection(HandleManager.resolveToObject(getDSContext(),handle_list[i]));
+           }
+       }
        // Hand off to the master thingy.... 
-       //(specify "S" for submission item, for FlowUtils.findSubmission())
+       // (specify "S" for submission item, for FlowUtils.findSubmission())
        submissionControl(handle,"S"+workspaceID, step);
+
        
    }
    else
