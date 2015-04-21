@@ -156,6 +156,7 @@ function doSubmission()
    var workspaceID = cocoon.request.get("workspaceID");
    //var workspace;
    
+	   
    if (workspaceID == null)
    {
        var handle = cocoon.parameters["handle"];
@@ -165,11 +166,17 @@ function doSubmission()
            handle = cocoon.request.get("handle");
        
        var collectionSelected = false;
+       var flagScope = false;
        do {
            if (handle != null)
            {
                ReadBack.showString(handle);
-
+               if(flagScope == false){
+            	   sendPageAndWait("submit/selectCollectionStep", { "handle" : handle } );
+                   handle = cocoon.request.get("handle");
+                   flagScope = true;
+               }
+               
                if (handle.toString().charAt(0)==91){
                    // Handles the case where there are multiple collections selected for the submission.
                    // Passed in as handle=[handle1, handle2, handle3]
@@ -199,10 +206,13 @@ function doSubmission()
                    }
                }
            }
+           if(flagScope == false){
+        	   sendPageAndWait("submit/selectCollectionStep", { "handle" : handle } );
+        	   handle = cocoon.request.get("handle");
+        	   flagScope=true;
+           }
            
-           sendPageAndWait("submit/selectCollectionStep", { "handle" : handle } );
-       
-           handle = cocoon.request.get("handle");
+           
                      
        } while (collectionSelected == false)
       
@@ -255,6 +265,7 @@ function doSubmission()
 
 
        }
+	   
    }
 
 }
