@@ -166,6 +166,7 @@ function doSubmission()
            handle = cocoon.request.get("handle");
        
        var collectionSelected = false;
+       //flagScope allows differentiating from where a submission was initiated.
        var flagScope = false;
        do {
            if (handle != null)

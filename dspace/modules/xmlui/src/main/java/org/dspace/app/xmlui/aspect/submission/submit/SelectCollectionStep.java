@@ -10,6 +10,8 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.utils.UIException;
@@ -104,12 +106,27 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setHelp(T_collection_help);
 
         select.addOption("", T_collection_default);
+
         for (Collection collection : collections)
         {
             select.addOption(collection.getHandle(),
                     CollectionDropDown.collectionPath(collection));
+
         }
 
+        /**
+         * Case for submitting from a chosen collection allowing choice of more
+         * collections to submit to. This enables the pre-selection of
+         * collection in the drop-down menu.
+         */
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String URI = request.getRequestURI();
+        if (URI.indexOf("handle/") != -1)
+        {
+            String handle = URI.substring(URI.indexOf("handle/") + 7,
+                    URI.indexOf("/submit"));
+            select.setOptionSelected(handle);
+        }
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
     }
