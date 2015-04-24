@@ -35,8 +35,6 @@ importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
 
-importClass(Packages.org.dspace.app.xmlui.vivian.ReadBack);
-
 importClass(Packages.org.dspace.content.Collection);
 
 /* Global variable which stores a comma-separated list of all fields 
@@ -171,7 +169,6 @@ function doSubmission()
        do {
            if (handle != null)
            {
-               ReadBack.showString(handle);
                if(flagScope == false){
             	   sendPageAndWait("submit/selectCollectionStep", { "handle" : handle } );
                    handle = cocoon.request.get("handle");
@@ -183,9 +180,7 @@ function doSubmission()
                    // Passed in as handle=[handle1, handle2, handle3]
                    var temp = handle.toString().slice(1,-1); // In order to remove the braces.
                    handle_list=temp.split(", "); //Splits the handles to an array of handles.
-                   handle = handle_list[0];
-                   ReadBack.showString(handle);
-                   ReadBack.showString(handle_list);
+                   handle = handle_list[0]; //Assigns the root collection as the primary collection for the submission
                }
 
                var dso = HandleManager.resolveToObject(getDSContext(), handle);
@@ -198,7 +193,6 @@ function doSubmission()
                    {
                        // Construct a new workspace for this submission.
                        var workspace = WorkspaceItem.create(getDSContext(), dso, true);
-                       //var workspace = WorkspaceItem.create(getDSContext(), Collection.find(getDSContext(),dso.getID()), true);
                        workspaceID = workspace.getID();
                        
                        collectionSelected = true;

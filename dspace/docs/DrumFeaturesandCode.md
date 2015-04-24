@@ -610,6 +610,16 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 
 * [complete.jsp](../modules/jspui/src/main/webapp/submit/complete.jsp) - remove Submit to Collection link when submission is complete
 
+*XMLUI webapp*
+
+* [SelectCollectionStep.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/submission/submit/SelectCollectionStep.java) - Changes to support selection of multiple collections. Also pre-selection of collection when submitting from one.
+
+* [submission.js](../modules/xmlui/src/main/resources/aspects/Submission/submission.js) - Changes to support selection of multiple collections and to populate the select collection(s) page when submitting from a collection.
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Modified the collection selection help message.
+
+
+
 *Configuration*
 
 * [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - submission fixes for selecting multiple collections

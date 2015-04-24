@@ -62,7 +62,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
-    WingException
+            WingException
     {
 
         pageMeta.addMetadata("title").addContent(T_submission_title);
@@ -72,7 +72,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-    UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException
     {
         Collection[] collections; // List of possible collections.
         String actionURL = contextPath + "/submit/" + knot.getId()
@@ -104,8 +104,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setAutofocus("autofocus");
         select.setLabel(T_collection);
         select.setHelp(T_collection_help);
-
-        select.addOption("", T_collection_default);
 
         for (Collection collection : collections)
         {
@@ -151,8 +149,8 @@ public class SelectCollectionStep extends AbstractSubmissionStep
      */
     @Override
     public List addReviewSection(List reviewList) throws SAXException,
-    WingException, UIException, SQLException, IOException,
-    AuthorizeException
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
     {
         // Currently, the selecting a Collection is not reviewable in DSpace,
         // since it cannot be changed easily after creating the item
