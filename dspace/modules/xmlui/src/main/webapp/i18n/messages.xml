@@ -655,60 +655,60 @@
     <message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
     <message key="xmlui.Submission.submit.progressbar.CClicense">CC License</message>
     <message key="xmlui.Submission.submit.progressbar.license">License</message>
-    <message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
-    <!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
-    <message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
+	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
-    <!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
-    <message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
-    <message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
-    <message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection you wish to submit an item to.</message>
-    <message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
+	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
+	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 
-    <!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
-    <message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
-    <message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Exit by accident.</message>
-    <message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
-    <message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
-    <message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
+	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
+	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
+	<message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
+	<message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection(s) you wish to submit an item to. (Ctrl / ⌘ + click to select multiple.)</message>
+	<message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
+
+	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Exit by accident.</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
 
-    <!-- org.dpspace.app.xmlui.Submission.submit.InitialQuestionsStep -->
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.head">Initial Questions</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.important_note">Important Note: </message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.and"> and </message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.separator">, </message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.open_set"> (</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <i>e.g. a translated title</i></message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox above is unchecked then the following will be removed from the item:</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.date_issued">Date Issued</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.citation">Citation</message>
-    <message key="xmlui.Submission.submit.InitialQuestionsStep.publisher">Publisher</message>
+	<!-- org.dpspace.app.xmlui.Submission.submit.InitialQuestionsStep -->
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.head">Initial Questions</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.important_note">Important Note: </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.and"> and </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.separator">, </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.open_set"> (</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <i>e.g. a translated title</i></message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox above is unchecked then the following will be removed from the item:</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.date_issued">Date Issued</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.citation">Citation</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.publisher">Publisher</message>
 
-    <!-- org.dspace.app.xmlui.Submission.submit.DescribeStep -->
-    <message key="xmlui.Submission.submit.DescribeStep.head">Describe Item</message>
-    <message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknown field type</message>
-    <message key="xmlui.Submission.submit.DescribeStep.required_field">This field is required</message>
-    <message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <i>e.g. Smith</i></message>
-    <message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name(s) + "Jr", <i>e.g. Donald Jr</i></message>
-    <message key="xmlui.Submission.submit.DescribeStep.year">Year</message>
-    <message key="xmlui.Submission.submit.DescribeStep.month">Month</message>
-    <message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
-    <message key="xmlui.Submission.submit.DescribeStep.series_name">Series Name</message>
-    <message key="xmlui.Submission.submit.DescribeStep.report_no">Report or paper No.</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.link">Subject Categories</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Subject Categories</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.label">Filter subjects</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filter</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
-    <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
-
+	<!-- org.dspace.app.xmlui.Submission.submit.DescribeStep -->
+	<message key="xmlui.Submission.submit.DescribeStep.head">Describe Item</message>
+	<message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknown field type</message>
+	<message key="xmlui.Submission.submit.DescribeStep.required_field">This field is required</message>
+	<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <i>e.g. Smith</i></message>
+	<message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name(s) + "Jr", <i>e.g. Donald Jr</i></message>
+	<message key="xmlui.Submission.submit.DescribeStep.year">Year</message>
+	<message key="xmlui.Submission.submit.DescribeStep.month">Month</message>
+	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
+	<message key="xmlui.Submission.submit.DescribeStep.series_name">Series Name</message>
+	<message key="xmlui.Submission.submit.DescribeStep.report_no">Report or paper No.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.link">Subject Categories</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Subject Categories</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.label">Filter subjects</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filter</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
     <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>

@@ -640,6 +640,15 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 
 * [complete.jsp](../modules/jspui/src/main/webapp/submit/complete.jsp) - remove Submit to Collection link when submission is complete
 
+*XMLUI webapp*
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/objectManager/ItemAdapter.java) - Added the code to populate the mets file with the download count.
+
+* [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - Added the text and formatting to display the "No. of  Downloads" for each item.
+
+
 *Configuration*
 
 * [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - submission fixes for selecting multiple collections
