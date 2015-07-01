@@ -530,6 +530,20 @@
                     </map:match>
 
                     <!-- Theme pipeline -->
+                    <map:match pattern="DRI/external/**">
+                        <map:generate src="http://192.168.50.1:8080/site/restapi/drumcontent/{1}" type="file"/>
+                        <!--map:transform type="external" /-->
+                        <map:transform src="transform-content.xsl" />
+                        <map:transform src="transform-pagemeta.xsl">
+                            <map:parameter name="contextPath" value="{request:contextPath}" />
+                            <map:parameter name="relativePath" value="{1}" />
+                        </map:transform>
+                        <map:transform type="IncludePageMeta">
+                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                        </map:transform>
+                        <map:serialize type="xml"/>
+                    </map:match>
+                    
                     <map:match pattern="DRI/**">
                         <map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
                     </map:match>
