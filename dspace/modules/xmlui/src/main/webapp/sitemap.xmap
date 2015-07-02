@@ -535,6 +535,7 @@
                         <!--map:transform type="external" /-->
                         <map:transform src="transform-content.xsl" />
                         <map:transform src="transform-pagemeta.xsl">
+                            <map:parameter name="qualifier" value="external" />
                             <map:parameter name="contextPath" value="{request:contextPath}" />
                             <map:parameter name="relativePath" value="{1}" />
                         </map:transform>

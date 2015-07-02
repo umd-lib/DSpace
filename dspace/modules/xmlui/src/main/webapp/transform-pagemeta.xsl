@@ -7,6 +7,7 @@
 
   <xsl:output indent="yes"/>            
 
+   <xsl:param name="qualifier" />
    <xsl:param name="contextPath" />
    <xsl:param name="relativePath" />
    <xsl:variable name="vLower" select="'abcdefghijklmnopqrstuvwxyz'"/>
@@ -58,8 +59,8 @@
             <xsl:copy-of select="dri:metadata[@element='title']" />
          </trail>
          <!-- Add contextapth -->
-         <metadata element="contextPath">/<xsl:value-of select="$context" /></metadata>
-         <metadata element="title"><xsl:value-of select="$relativePath" /></metadata>
+         <metadata element="request" qualifier="URI"><xsl:value-of select="$qualifier"/>/<xsl:value-of select="$relativePath"/></metadata>
+         <metadata element="qualifier"><xsl:value-of select="$qualifier" /></metadata>
 
          <!-- copy everything other than the tags processed above -->
          <xsl:apply-templates select="*[not(self::trail or self::dri:metadata[@element='contextPath'])]" />
@@ -72,7 +73,7 @@
       <xsl:if test="contains($relPath, '/')">
          <xsl:variable name="trail" select="substring-before($relPath, '/')" />
          <xsl:variable name="trailPath" select="concat($prefix, $trail, '/')" />
-         <trail target="/{$context}/external/{$trailPath}">
+         <trail target="/{$context}/{$qualifier}/{$trailPath}">
             <i18n:text catalogue="default"><xsl:value-of select="concat(translate(substring($trail,1,1), $vLower, $vUpper), substring($trail,2))" /></i18n:text>
          </trail>
          <xsl:call-template name="path-trail">
