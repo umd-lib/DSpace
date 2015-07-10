@@ -175,6 +175,8 @@
                         <map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
+                                <exception name="not-found" class="java.io.FileNotFoundException"/>
+                                <exception name="hippo-connection-exception" class="java.net.ConnectException"/>
                                 <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
                                 <exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
@@ -530,6 +532,21 @@
                     </map:match>
 
                     <!-- Theme pipeline -->
+                    <map:match pattern="DRI/external/**">
+                        <map:generate src="http://192.168.50.1:8080/site/restapi/drumcontent/{1}" type="file"/>
+                        <!--map:transform type="external" /-->
+                        <map:transform src="transform-content.xsl" />
+                        <map:transform src="transform-pagemeta.xsl">
+                            <map:parameter name="qualifier" value="external" />
+                            <map:parameter name="contextPath" value="{request:contextPath}" />
+                            <map:parameter name="relativePath" value="{1}" />
+                        </map:transform>
+                        <map:transform type="IncludePageMeta">
+                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                        </map:transform>
+                        <map:serialize type="xml"/>
+                    </map:match>
+                    
                     <map:match pattern="DRI/**">
                         <map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
                     </map:match>
@@ -757,6 +774,20 @@
                                             </map:transform>
                                         </map:act>
                                         <map:serialize type="xhtml" status-code="404"/>
+                                </map:when>
+
+                                <map:when test="hippo-connection-exception">
+                                        <map:generate type="exception"/>
+                                        <map:transform src="exception2html.xslt">
+                                                <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                                <map:parameter name="pageTitle" value="Temporarily Unavalable"/>
+                                        </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
+                                        <map:serialize type="xhtml" status-code="503"/>
                                 </map:when>
 
                                 <map:when test="invalid-continuation">

@@ -81,3 +81,8 @@ header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
 	background-color: #f9f2f4;
 	display: inline;
 }
+
+.external > h1 { 
+    @extend .page-header; 
+    @extend .first-page-header;
+}

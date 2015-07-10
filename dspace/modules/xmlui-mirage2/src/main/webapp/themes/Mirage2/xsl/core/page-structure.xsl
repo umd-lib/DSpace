@@ -39,6 +39,7 @@
         Specifically, adding a static page will need to override the DRI, to directly add content.
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+    <xsl:variable name="qualifier" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='qualifier']"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -707,6 +708,11 @@
                     <div class="hero-unit">
                         <h1><i18n:text>xmlui.mirage2.page-structure.heroUnit.title</i18n:text></h1>
                         <p><i18n:text>xmlui.mirage2.page-structure.heroUnit.content</i18n:text></p>
+                    </div>
+                </xsl:when>
+                <xsl:when test="($qualifier != '') and (starts-with($request-uri, $qualifier))">
+                    <div class="external">
+                        <xsl:value-of select="/dri:document/dri:body" disable-output-escaping="yes" />
                     </div>
                 </xsl:when>
                 <!-- Otherwise use default handling of body -->
