@@ -161,31 +161,29 @@
         -->
 	<profile>
 	  <id>installer-dist</id>
-            <dependencies>
-            </dependencies>
-          <build>
-            <defaultGoal>validate</defaultGoal>
-            <plugins>
-              <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>distro-assembly</id>
-                    <phase>validate</phase>
-                    <goals>
-                      <goal>single</goal>
-                    </goals>
-                    <configuration>
-                      <descriptors>
-                        <descriptor>src/main/assembly/dspace-installer-distribution.xml
-                        </descriptor>
-                      </descriptors>
-                    </configuration>
-                  </execution>
-                </executions>
-              </plugin>
-            </plugins>
-          </build>
+      <build>
+        <defaultGoal>validate</defaultGoal>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <descriptors>
+                    <descriptor>src/main/assembly/dspace-installer-distribution.xml
+                    </descriptor>
+                </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <id>distro-assembly</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
 	</profile>
 
     </profiles>

@@ -1,5 +1,5 @@
 <assembly xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd" xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <id>dspace-installer-${version}-${env}</id>
+  <id>dspace-installer-${version}</id>
   <formats>
     <format>tar.gz</format>
   </formats>
@@ -7,7 +7,7 @@
   <fileSets>
     <fileSet>
       <directory>target/dspace-installer</directory>
-      <outputDirectory>dspace-installer-${version}-${env}</outputDirectory>
+      <outputDirectory>dspace-installer-${version}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
