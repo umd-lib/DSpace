@@ -771,7 +771,7 @@ public class EtdLoader
         String strEmbargo = null;
 
         Node n = getXPath(
-                "/DISS_submission/DISS_restriction/DISS_sales_restriction[@code=\"1\"]")
+                "/DISS_submission/DISS_repository/DISS_delayed_release")
                 .selectSingleNode(meta);
 
         if (n != null)
