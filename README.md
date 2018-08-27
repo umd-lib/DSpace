@@ -30,6 +30,32 @@ cd /apps/git/drum/dspace
 mvn install
 ```
 
+### Development Environemnt
+
+Useful commands:
+```
+# Start dspace, postgres, and solr docker containers for drum
+docker-compose -p drum up -d
+
+# Update the dspace container with the current build
+docker exec -w /dspace-src/dspace/target/dspace-installer drum_dspace_1 ant update clean_backups
+
+# Restart the dspace container after ant update
+docker container restart drum_dspace_1
+
+# See tomcat logs
+docker logs -f drum_dspace_1
+
+# Bash shell into dspace container
+docker exec -it -w /dspace drum_dspace_1 bash
+
+# psql client to dspace database container
+docker exec -it drum_dspacedb_1 psql -U dspace dspace
+
+# Tail a particular log file from the dspace container
+docker exec -w /dspace drum_dspace_1 tail -f log/dspace.log.2018-08-15
+```
+
 ### Deployment
 
 The `dspace-installer` directory that contains all the artifacts and the ant script to perform the deployment. The `installer-dist` maven profile creates a tar file of the installer directory which can be pushed to the UMD nexus by using the `deploy-release` or `deploy-snapshot` profile.
