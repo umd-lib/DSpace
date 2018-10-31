@@ -13,7 +13,7 @@ services:
     stdin_open: true
 
   dspace:
-    image: "dspace/dspace:dspace-6_x"
+    image: "docker.lib.umd.edu/drum:develop_latest"
     mem_limit: 2048m
     environment:
       - DSPACE_INSTALL=/dspace
@@ -24,7 +24,8 @@ services:
       - 9000:9000
      # - 9090:9090
     volumes:
-      - "/apps/git/drum:/dspace-src"
+      - "/apps/git/drum/dspace/target/dspace-installer:/dspace-installer"
+      - "/apps/git/drum/dspace/config/local.cfg:/dspace/config/local.cfg"
       - "/apps/git/drum-env:/drum-env"
     networks:
       - dspacenet

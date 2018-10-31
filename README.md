@@ -38,7 +38,7 @@ Useful commands:
 docker-compose -p drum up -d
 
 # Update the dspace container with the current build
-docker exec -w /dspace-src/dspace/target/dspace-installer drum_dspace_1 ant update clean_backups
+docker exec -w /dspace-installer drum_dspace_1 ant update clean_backups
 
 # Restart the dspace container after ant update
 docker container restart drum_dspace_1
