@@ -126,7 +126,7 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
-                           <classifier>testEnvironment</classifier>
+                           <classifier>testEnvironment-additions</classifier>
                         </artifactItem>
                      </artifactItems>
                   </configuration>
@@ -195,7 +195,7 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
-                           <classifier>testEnvironment</classifier>
+                           <classifier>testEnvironment-additions</classifier>
                         </artifactItem>
                      </artifactItems>
                   </configuration>
