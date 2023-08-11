@@ -312,9 +312,11 @@ crosswalk.dissemination.DataCite.publisher = Digital Repository at the Universit
 crosswalk.dissemination.DataCite.stylesheet = crosswalks/DIM2UmdDataCite.xsl
 
 ####################
-# GOOGLE ANALYTICS #
+# MATOMO ANALYTICS #
 ####################
-xmlui.google.analytics.key=
+matomo.analytics.url =
+matomo.analytics.site-id =
+matomo.analytics.cdn-src =
 
 #####################
 # LOGLEVEL SETTINGS #
