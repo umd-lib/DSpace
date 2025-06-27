@@ -188,7 +188,9 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterContentInOriginalBundle"/>
+                <!-- UMD Customization -->
+                <!-- <ref bean="searchFilterContentInOriginalBundle"/> -->
+                <!-- End UMD Customization -->
                 <ref bean="searchFilterEntityType"/>
             </list>
         </property>
@@ -197,9 +199,17 @@
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
-                <ref bean="searchFilterTitle" />
+                <!-- UMD Customization -->
+                <!-- <ref bean="searchFilterTitle" /> -->
+                <ref bean="searchFilterKeyword" />
                 <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterAdvisor" />
+                <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterDepartment" />
+                <ref bean="searchFilterType" />
+                <ref bean="searchFilterAbstract" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
@@ -210,6 +220,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- End UMD Customization -->
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -518,9 +529,17 @@
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
-                <ref bean="searchFilterTitle" />
+                <!-- UMD Customization -->
+                <!-- <ref bean="searchFilterTitle" /> -->
+                <ref bean="searchFilterKeyword" />
                 <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterAdvisor" />
+                <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterDepartment" />
+                <ref bean="searchFilterType" />
+                <ref bean="searchFilterAbstract" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
@@ -531,6 +550,7 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <!-- End UMD Customization -->
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2646,9 +2666,16 @@
         <property name="indexFieldName" value="itemtype" />
         <property name="metadataFields">
             <list>
-                <value>dc.type</value>
+                <!-- UMD Customization -->
+                <value>dc.type.*</value>
+                <!-- End UMD Customization -->
             </list>
         </property>
+        <!-- UMD Customization -->
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <!-- End UMD Customization -->
     </bean>
 
     <bean id="searchFilterIdentifier" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -3282,6 +3309,71 @@
         <property name="exposeMinAndMaxValue" value="true"/>
     </bean>
 
+    <!-- UMD Customization -->
+    <bean id="searchFilterKeyword" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="keyword"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.subject.*</value>
+                <value>dc.description.*</value>
+                <value>dc.publisher.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterDepartment" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="department"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.department</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAbstract" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="abstract"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.description.abstract</value>
+                <value>dc.description.tableofcontents</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="language"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.language.iso</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="advisor"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.advisor</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+    <!-- End UMD Customization -->
+
     <!--Sort properties-->
     <bean id="sortScore" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="defaultSortOrder" value="desc"/>
@@ -3400,5 +3492,9 @@
         <property name="type" value="date"/>
         <property name="defaultSortOrder" value="desc"/>
     </bean>
+
+    <!-- UMD Customization -->
+    <bean id="SolrServiceCommunityGroupIndexingPlugin" class="org.dspace.discovery.SolrServiceCommunityGroupIndexingPlugin" scope="prototype"/>
+    <!-- End UMD Customization -->
 
 </beans>

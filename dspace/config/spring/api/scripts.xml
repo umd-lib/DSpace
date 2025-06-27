@@ -102,4 +102,11 @@
        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
     </bean>
 
+    <!-- UMD Customization -->
+    <bean id="embargo-list-export" class="edu.umd.lib.dspace.content.EmbargoListExportCliScriptConfiguration">
+        <property name="description" value="Export list of embargoed items" />
+        <property name="dspaceRunnableClass" value="edu.umd.lib.dspace.content.EmbargoListExportCli"/>
+    </bean>
+    <!-- End UMD Customization -->
+
 </beans>

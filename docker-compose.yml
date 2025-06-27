@@ -6,6 +6,21 @@ networks:
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
         - subnet: 172.23.0.0/16
 services:
+  # UMD Customization
+  # Nginx server configuration for supporting HTTPS connections from the
+  # local development environment
+  nginx:
+    container_name: nginx
+    image: nginx:1.25.2
+    ports:
+    - "80:80"
+    - "443:8443"
+    volumes:
+    - ./dspace/src/main/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./dspace/src/main/docker/nginx/certs:/etc/nginx/certs:ro
+    networks:
+      dspacenet:
+  # End UMD Customization
   # DSpace (backend) webapp container
   dspace:
     container_name: dspace
@@ -17,21 +32,34 @@ services:
       # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
       dspace__P__dir: /dspace
       # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
-      # dspace__P__server__P__url: http://localhost:8080/server
-      # dspace__P__ui__P__url: http://localhost:4000
+      # UMD Customization
+      dspace__P__server__P__url: https://api.drum-local.lib.umd.edu/server
+      dspace__P__ui__P__url: https://drum-local.lib.umd.edu:4000
+      # End UMD Customization
       dspace__P__name: 'DSpace Started with Docker Compose'
       # db.url: Ensure we are using the 'dspacedb' image for our database
-      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      # UMD Customization
+      db__P__url: 'jdbc:postgresql://dspacedb:5432/drum'
+      # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: http://dspacesolr:8983/solr
+      # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
+      matomo__P__tracker__P__url: http://matomo
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
       LOGGING_CONFIG: /dspace/config/log4j2-container.xml
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-8_x-test}"
+      # UMD Customization
+      JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+      # End UMD Customization
+    # UMD Customization
+    image: "docker.lib.umd.edu/drum:${DSPACE_VER:-8_x-dev}"
+    # End UMD Customization
     build:
       context: .
-      dockerfile: Dockerfile.test
+      # UMD Customization
+      dockerfile: Dockerfile.dev
+      # End UMD Customization
     depends_on:
     - dspacedb
     networks:
@@ -59,18 +87,26 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
-      java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      # UMD Customization
+      java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      # End UMD Customization
   # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
     # Uses a custom Postgres image with pgcrypto installed
-    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-dspace-8_x}"
+    # UMD Customization
+    image: docker.lib.umd.edu/dspace-postgres:${DSPACE_VER:-latest}
+    # End UMD Customization
     build:
       # Must build out of subdirectory to have access to install script for pgcrypto
       context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
     environment:
       PGDATA: /pgdata
-      POSTGRES_PASSWORD: dspace
+      # UMD Customization
+      POSTGRES_DB: drum
+      POSTGRES_USER: drum
+      POSTGRES_PASSWORD: drum
+      # End UMD Customization
     networks:
       dspacenet:
     ports:
@@ -81,6 +117,9 @@ services:
     volumes:
     # Keep Postgres data directory between reboots
     - pgdata:/pgdata
+    # UMD Customization
+    - ./postgres-init:/docker-entrypoint-initdb.d
+    # End UMD Customization
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr

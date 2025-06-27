@@ -129,6 +129,12 @@
 
     <bean class="org.dspace.util.FrontendUrlService"/>
 
+    <!-- UMD Customization -->
+    <bean class="org.dspace.content.EtdUnitServiceImpl"/>
+    <bean class="org.dspace.content.CommunityGroupServiceImpl"/>
+    <bean class="org.dspace.eperson.UnitServiceImpl"/>
+    <!-- End UMD Customization -->
+    
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>

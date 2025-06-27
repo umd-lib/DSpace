@@ -74,4 +74,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControl"/>
     </bean>
 
+    <!-- UMD Customization -->
+    <bean id="embargo-list-export" class="edu.umd.lib.dspace.content.EmbargoListExportScriptConfiguration">
+        <property name="description" value="Export list of embargoed items" />
+        <property name="dspaceRunnableClass" value="edu.umd.lib.dspace.content.EmbargoListExport"/>
+    </bean>
+    <!-- End UMD Customization -->
+
 </beans>

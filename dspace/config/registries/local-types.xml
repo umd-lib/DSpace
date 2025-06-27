@@ -32,4 +32,13 @@
   </dc-type>
 -->
 
+  <!-- UMD Customization -->
+  <dc-type>
+    <schema>local</schema>
+    <element>equitableAccessSubmission</element>
+    <qualifier></qualifier>
+    <scope_note>Indicates whether item is being submitted in compliance with the UMD "Equitable Access" policy</scope_note>
+  </dc-type>
+  <!-- End UMD Customization -->
+
 </dspace-dc-types>

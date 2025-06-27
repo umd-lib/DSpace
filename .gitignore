@@ -1,3 +1,18 @@
+## UMD Customization
+## Ignore temporary directories related to helper scripts
+scripts/work
+scripts/patches
+
+# Ignore HTTPS certificates
+dspace/src/main/docker/nginx/certs/*
+!dspace/src/main/docker/nginx/certs/.keep
+
+# Ignore database dump directory to be used with docker-compose for initializing
+postgres-init/*
+!postgres-init/README.md
+!postgres-init/pg_restore.sh
+## End UMD Customization
+
 ## Ignore the MVN compiled output directories from version tracking
 target/
 

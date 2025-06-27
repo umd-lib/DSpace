@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+#####################################################################
+# Copyright 2006, The University of Maryland.  All rights reserved.
+#
+# Program:   load-etd
+#
+# Author:    Ben Wallberg
+#
+# Purpose:   Load ProQuest ETD into DSpace.
+#
+# Usage:     See PrintUsageAndExit()
+#
+# Comments:  Adapted from load-diss
+#
+#####################################################################
+
+use Getopt::Std;
+
+#
+# Check the command-line parameters
+#
+GetCmdLine();
+
+# Get directories
+chomp($bindir = `dirname $0`);
+
+# Use UMD_DSPACE_CLI_LOG_CONFIG to override the dspace-cli log configuration
+$ENV{UMD_DSPACE_CLI_LOG_CONFIG} = "-Dlog4j2.configurationFile=log4j2-etdloader.xml";
+$ENV{JAVA_OPTS} .= " -Ddspace.log.init.disable=true";
+$ENV{JAVA_OPTS} .= " -Detdloader.zipfile=$zipfile";
+$ENV{JAVA_OPTS} .= " -Detdloader.singleitem=$item" if (defined $item);
+
+# Add additions jar to front of classpath to ensure the overlay files
+# has precedence over stock implementation
+chomp($bindir_realpath = `realpath $bindir`);
+chomp($dspacedir = `dirname $bindir_realpath`);
+chomp($additions_jar = `find $dspacedir/lib/ -type f -name "additions*.jar"`);
+$prev_classpath = $ENV{CLASSPATH};
+$classpath_separator = ":";
+$ENV{CLASSPATH} = $additions_jar;
+$ENV{CLASSPATH} .= $classpath_separator.$prev_classpath if ($prev_classpath ne "");
+
+@cmd = ("$bindir/dspace", "dsrun", "edu.umd.lib.dspace.app.EtdLoader");
+
+#print $ENV{JAVA_OPTS};
+#print (join ' ',@cmd) . "\n";
+system(@cmd);
+
+exit 0;
+
+
+########################################################## GetCmdLine
+# Process the command line options.
+#####################################################################
+
+sub GetCmdLine {
+
+    if ($#ARGV < 0 || ($#ARGV == 0 && $ARGV[0] eq "-h")) {
+        PrintUsageAndExit();
+    }
+
+    if ( ! getopts('i:r:')) {
+        print "Error in option processing\n\n";
+        PrintUsageAndExit();
+    }
+
+    if (! defined $opt_i) {
+        PrintUsageAndExit("Error: <zipfile> is a required parameter");
+    }
+    $zipfile = $opt_i;
+
+    if (defined $opt_r) {
+	$item = $opt_r;
+    }
+
+}
+
+
+################################################### PrintUsageAndExit
+# Print the program usage and exit.
+#####################################################################
+
+sub PrintUsageAndExit {
+
+    if (@_) {
+        foreach $msg (@_) {
+            print "$msg\n";
+        }
+        print "\n";
+    }
+
+    print <<'EOS';
+Usage: load-etd -i <zipfile> [-r <item>]
+    <zipfile>:  zip file containing items to load
+    <item>:     process a single item, not the entire zip file
+EOS
+
+    exit 1;
+}
+

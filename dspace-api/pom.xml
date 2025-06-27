@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>8.1</version>
+        <version>8.1-drum-1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -349,6 +349,13 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j2-impl</artifactId>
         </dependency>
+        <!-- UMD Customization -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-layout-template-json</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- End UMD Customization -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -771,7 +778,6 @@
             <version>1.19.0</version>
             <scope>test</scope>
         </dependency>
-
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -813,7 +819,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
           <groupId>eu.openaire</groupId>
           <artifactId>broker-client</artifactId>
@@ -847,7 +853,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>io.findify</groupId>
             <artifactId>s3mock_2.13</artifactId>

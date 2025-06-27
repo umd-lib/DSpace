@@ -7,7 +7,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>8.1</version>
+        <version>8.1-drum-1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -128,10 +128,13 @@
             </activation>
             <build>
                 <plugins>
+                    <!-- UMD Customization -->
                     <!-- Unit Testing setup: This plugin unzips the
-                         'testEnvironment.zip' file (created by dspace-parent POM), into
-                         the 'target/testing/' folder, to essentially create a test
+                         'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, as this module incorporates
+                         the "additions" module, to essentially create a test
                          install of DSpace, against which Tests can be run. -->
+                    <!-- End UMD Customization -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -142,7 +145,9 @@
                                     <artifactId>dspace-parent</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
-                                    <classifier>testEnvironment</classifier>
+                                    <!-- UMD Customization -->
+                                    <classifier>testEnvironment-additions</classifier>
+                                    <!-- End UMD Customization -->
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -198,10 +203,13 @@
             </activation>
             <build>
                 <plugins>
+                    <!-- UMD Customization -->
                     <!-- Integration Testing setup: This plugin unzips the
-                         'testEnvironment.zip' file (created by dspace-parent POM), into
-                         the 'target/testing/' folder, to essentially create a test
+                         'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, as this module incorporates
+                         the "additions" module, to essentially create a test
                          install of DSpace, against which Tests can be run. -->
+                    <!-- End UMD Customization -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -212,7 +220,9 @@
                                     <artifactId>dspace-parent</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
-                                    <classifier>testEnvironment</classifier>
+                                    <!-- UMD Customization -->
+                                    <classifier>testEnvironment-additions</classifier>
+                                    <!-- End UMD Customization -->
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

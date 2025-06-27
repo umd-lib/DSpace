@@ -1,0 +1,53 @@
+#!/bin/csh
+
+# load-etd-nightly
+#
+# Check for new upload files in the incoming directory and load
+# them into dspace.
+#
+
+# Get command-line arguments
+if ($#argv != 1) then
+    echo "Usage: $0 <dir>"
+    echo "    <dir>:    Directory containing Proquest ETD files"
+    exit 0
+endif
+
+set datadir = `cd $argv[1]; pwd`
+set bindir  = `dirname $0`
+set incomingdir = $datadir/incoming
+set processeddir = $datadir/processed
+
+# Check for incoming files
+ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
+if ($status == 0) then
+  echo Files found in $incomingdir
+
+  @ count = 0
+
+  foreach upload ($incomingdir/etdadmin_upload_*.zip)
+    set zipfile = `basename $upload`
+
+    # Load the files from this archive
+    echo
+    echo ======================================================================
+    echo Loading archive file: $incomingdir/$zipfile
+    $bindir/load-etd -i $incomingdir/$zipfile
+
+    # Move archive to the processed directory
+    if (! -d $processeddir ) then
+      mkdir -p $processeddir
+    endif
+    echo
+    echo ' ' Moving $zipfile to $processeddir
+    mv $incomingdir/$zipfile $processeddir
+
+    @ count = $count + 1
+  end
+endif
+
+
+
+
+
+

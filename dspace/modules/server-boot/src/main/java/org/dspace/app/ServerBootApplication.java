@@ -12,6 +12,9 @@ import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+// UMD Customization
+import org.springframework.context.annotation.Import;
+// End UMD Customization
 
 /**
  * Define the Spring Boot Application settings itself to be runned using an
@@ -22,6 +25,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  */
 @SuppressWarnings({ "checkstyle:hideutilityclassconstructor" })
 @SpringBootApplication(scanBasePackageClasses = WebApplication.class)
+// UMD Customization
+@Import({ UmdTomcatWebServerFactoryCustomizer.class })
+// End UMD Customization
 public class ServerBootApplication {
 
     public static void main(String[] args) {

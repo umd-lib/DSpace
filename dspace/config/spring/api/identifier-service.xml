@@ -51,7 +51,7 @@
          the DOIIdentifierProvider or the VersionedDOIIdentifierProvider,
          depending on whether you have Item Level Versioning activated or not.
     -->
-    <!--
+    <!-- UMD Customization -->
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
         scope="singleton">
@@ -60,7 +60,7 @@
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
     </bean>
-    -->
+    <!-- End UMD Customization -->
     <!--
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.VersionedDOIIdentifierProvider"
@@ -97,17 +97,18 @@
          e.g. EZID is part of DataCite but provides their own APIs. The following
          DataCiteConnector won't work if EZID is your registration agency.
     -->
-    <!-- Uncomment this to use the DataCite API directly as DOIConnector.
+    <!-- Uncomment this to use the DataCite API directly as DOIConnector.-->
+    <!-- UMD Customization -->
     <bean id="org.dspace.identifier.doi.DOIConnector"
         class="org.dspace.identifier.doi.DataCiteConnector"
         scope="singleton">
         <property name='DATACITE_SCHEME' value='https'/>
-        <property name='DATACITE_HOST' value='mds.test.datacite.org'/>
+        <property name='DATACITE_HOST' value="${identifier.doi.datacite.host}"/>
         <property name='DATACITE_DOI_PATH' value='/doi/' />
         <property name='DATACITE_METADATA_PATH' value='/metadata/' />
         <property name='disseminationCrosswalkName' value="DataCite" />
     </bean>
-    -->
+    <!-- End UMD Customization -->
 
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->

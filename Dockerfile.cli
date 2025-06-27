@@ -7,13 +7,19 @@
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
 # The Docker version tag to build from
-ARG DSPACE_VERSION=dspace-8_x
+# UMD Customization
+# Continuing to use "latest" because this allows a new image to be easily
+# created and pushed to the Nexus
+ARG DSPACE_VERSION=latest
+# End UMD Customization
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
 # NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
 ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
-FROM ${DOCKER_REGISTRY}/dspace/dspace-dependencies:${DSPACE_VERSION} AS build
+# UMD Customization
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} AS build
+# End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -23,6 +29,10 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
+# UMD Customization
+COPY --chown=dspace dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
+# End UMD Customization
+
 # Build DSpace.  Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 RUN mvn --no-transfer-progress package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \

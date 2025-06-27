@@ -7,13 +7,19 @@
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
 # The Docker version tag to build from
-ARG DSPACE_VERSION=dspace-8_x
+# UMD Customization
+# Continuing to use "latest" because this allows a new image to be easily
+# created and pushed to the Nexus
+ARG DSPACE_VERSION=latest
+# End UMD Customization
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
 # NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
 ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
-FROM ${DOCKER_REGISTRY}/dspace/dspace-dependencies:${DSPACE_VERSION} AS build
+# UMD Customization
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} AS build
+# End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -69,5 +75,25 @@ RUN apt-get update \
 EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
+
+# UMD Customization
+ENV TZ=America/New_York
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        rsync \
+        openssh-client \
+        cron \
+        csh \
+        postfix \
+        s-nail \
+        libgetopt-complete-perl \
+        libconfig-properties-perl \
+        vim \
+        python3-lxml \
+        jq && \
+    mkfifo /var/spool/postfix/public/pickup && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# End UMD Customization
 # On startup, run DSpace Runnable JAR
 ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]

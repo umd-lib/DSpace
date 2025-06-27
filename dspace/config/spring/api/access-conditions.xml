@@ -9,14 +9,35 @@
 		<property name="metadata" value="bitstream-metadata" />
         <property name="options">
             <list>
-                <ref bean="openAccess"/>
+                <!-- UMD Customization -->
+                <!-- Commenting out to disable ability of user to set embargo -->
+                <!-- <ref bean="openAccess"/>
                 <ref bean="lease"/>
                 <ref bean="embargoed" />
-                <ref bean="administrator"/>
+                <ref bean="administrator"/> -->
+                <!-- End UMD Customization -->
                 <!-- <ref bean="networkAdministration"/> -->
             </list>
         </property>
     </bean>
+
+  <!-- UMD Customization -->
+  <bean id="uploadConfigurationOptional" class="org.dspace.submit.model.UploadConfiguration">
+    <property name="name" value="upload"/>
+    <property name="metadata" value="bitstream-metadata" />
+    <property name="options">
+      <list>
+          <!-- Commenting out to disable ability of user to set embargo -->
+          <!-- <ref bean="openAccess"/>
+          <ref bean="lease"/>
+          <ref bean="embargoed" />
+          <ref bean="administrator"/> -->
+           <!-- <ref bean="networkAdministration"/> -->
+      </list>
+    </property>
+    <property name="required" value="false"/>
+  </bean>
+  <!-- UMD Customization -->
 
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
@@ -55,6 +76,9 @@
         <property name="map">
             <map>
                 <entry key="upload" value-ref="uploadConfigurationDefault" />
+                <!-- UMD Customization -->
+                <entry key="optionalUpload" value-ref="uploadConfigurationOptional" />
+                <!-- End UMD Customization -->
             </map>
         </property>
     </bean>

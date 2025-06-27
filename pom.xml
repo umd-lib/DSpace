@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>8.1</version>
+    <version>8.1-drum-1-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -19,9 +19,22 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
-        <spring.version>6.2.2</spring.version>
-        <spring-boot.version>3.4.2</spring-boot.version>
-        <spring-security.version>6.4.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <!-- UMD Customization-->
+        <!--
+          Update Spring Boot version to 3.4.3 as a fix for CVE-2025-24813,
+          based on a recommendation in a March 18, 2025 email in the
+          "dspace-tech" mailing list from Tim Donohue.
+           The embedded Tomcat version should be 10.1.35 or later.
+
+           The update to the "spring.version" and "spring-security" was needed
+           in order for compatible jars to be available to Spring Boot.
+
+           This customization can be removed in future DSpace upgrades.
+        -->
+        <spring.version>6.2.3</spring.version>
+        <spring-boot.version>3.4.3</spring-boot.version>
+        <spring-security.version>6.4.3</spring-security.version> <!-- sync with version used by spring-boot-->
+        <!-- End UMD Customization-->
         <hibernate.version>6.4.8.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.5</postgresql.driver.version>
@@ -578,6 +591,26 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+                            <!-- UMD Customization -->
+                            <!--
+                                Test configuration for dspace/modules/additions.
+                                This "additions" module needs a separate test environment because it
+                                loads additional Hibernate entities, which must be configured via
+                                the XML files.
+                            -->
+                            <execution>
+                                <phase>generate-test-resources</phase>
+                                <id>testEnvironment-additons</id>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/testEnvironment-additions.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                            <!-- End UMD Customization -->
                         </executions>
                         <inherited>false</inherited>
                     </plugin>
@@ -1018,68 +1051,68 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>server</artifactId>
                 <classifier>classes</classifier>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>8.1</version>
+                <version>8.1-drum-1-SNAPSHOT</version>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>
@@ -1606,6 +1639,13 @@
                 <artifactId>log4j-slf4j2-impl</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+            <!-- UMD Customization -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-layout-template-json</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <!-- End UMD Customization -->
 
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>

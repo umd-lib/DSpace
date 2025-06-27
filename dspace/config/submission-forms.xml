@@ -1348,6 +1348,394 @@
             </row>
         </form>
 
+        <!-- UMD Customization -->
+        <!-- "Type" field (with Equitable Access question) for default UMD submissions -->
+        <form name="umdType">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <hint>Select the type of content of the item.
+                    </hint>
+                    <required>Please select a type for this item.</required>
+                </field>
+            </row>
+
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>equitableAccessSubmission</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Is this article being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy?</label>
+                    <input-type value-pairs-name="yes_no">dropdown</input-type>
+                    <hint></hint>
+                    <required>Please select "Yes" or "No"</required>
+                    <type-bind>
+                        <!-- Should only display for "Article" -->
+                        Article
+                    </type-bind>
+                </field>
+            </row>
+        </form>
+
+        <!-- "Type" field (without Equitable Access question) for MHHEA submissions -->
+        <form name="mhheaType">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <hint>Select the type of content of the item.
+                    </hint>
+                    <required>Please select a type for this item.</required>
+                </field>
+            </row>
+        </form>
+
+        <!-- Default "Describe" form for UMD submissions. Used for both
+             default and MHHEA submissions -->
+        <form name="umdDescribe">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Author (Last Name, First Name)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the author's name (Last name, First name).</hint>
+                    <required>You must enter an author for this item.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>advisor</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Advisor (Last Name, First Name)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the advisor's name (Last name, First name).</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required>You must enter a main title for this item.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Other Titles</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Date of Issue</label>
+                    <style>col-sm-4</style>
+                    <input-type>date</input-type>
+                    <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't applicable.
+                    </hint>
+                    <required>You must enter at least the year.</required>
+                </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publisher</label>
+                    <style>col-sm-8</style>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Publication or External Link</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>
+                        Enter the DOI (Digital Object Identifier) or other external link to the published version of this research work.
+                    </hint>
+                    <required></required>
+                    <regex>^(https*|DOI):(\/\/)*.*</regex>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Related Publication Link</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>
+                        Enter the link to any research publication supported by the dataset or software. If available, please use the DOI (Digital Object Identifier) for the publication.
+                    </hint>
+                    <required></required>
+                    <regex>^(https*|DOI):(\/\/)*.*</regex>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publication Citation</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has been previously published or has a corresponding publication, enter its bibliographic citation.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Related Publication Citation</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the standard citation for any research publication supported by the dataset or software.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Series/Report No.</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
+                    <input-type>series</input-type>
+                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Identifiers</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>If the item has any identification numbers or codes associated with
+                        it, please enter the types and the actual numbers or codes.
+                    </hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Select the language of the main content of the item. If the language does not appear in the
+                        list, please select 'Other'. If the content does not really have a language (for example, if it
+                        is a dataset or an image) please select 'N/A'.
+                    </hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Subject Keywords</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter appropriate subject keywords or phrases. To add multiple subject keywords, enter one term or phrase at a time and then click "Add more".</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Abstract</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter the abstract of the item.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sponsors</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter the names of any sponsors and/or funding codes in the box.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Description</label>
+                     <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
+                    <input-type>textarea</input-type>
+                    <hint>Enter any other description or comments in this box.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Methodology Description</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>textarea</input-type>
+                    <hint>Description of methods used for data collection/generation, processing, analysis, standards, quality-assurance procedures, etc.</hint>
+                    <required></required>
+                </field>
+            </row>
+        </form>
+        <!-- End UMD Customization -->
+
     </form-definitions>
 
 
@@ -1985,6 +2373,81 @@
                 <stored-value>FundingOrganization</stored-value>
             </pair>
         </value-pairs>
+
+        <!--  UMD Customization -->
+        <value-pairs value-pairs-name="yes_no" dc-term="type">
+            <pair>
+                <displayed-value>Yes</displayed-value>
+                <stored-value>Yes</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>No</displayed-value>
+                <stored-value>No</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- Values for the "Types" drop-down -->
+        <!-- Note: When adjusting these values, also adjust "type-bind"
+             attributes in the configuration above. -->
+        <value-pairs value-pairs-name="umd_common_types" dc-term="type">
+            <pair>
+                <displayed-value>Article</displayed-value>
+                <stored-value>Article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Audiovisual</displayed-value>
+                <stored-value>Audiovisual</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book chapter</displayed-value>
+                <stored-value>Book chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dissertation</displayed-value>
+                <stored-value>Dissertation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Image</displayed-value>
+                <stored-value>Image</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Preprint</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Presentation</displayed-value>
+                <stored-value>Presentation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Report</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Software</displayed-value>
+                <stored-value>Software</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Thesis</displayed-value>
+                <stored-value>Thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Working Paper</displayed-value>
+                <stored-value>Working Paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+        </value-pairs>
+        <!-- End UMD Customization -->
 
     </form-value-pairs>
 

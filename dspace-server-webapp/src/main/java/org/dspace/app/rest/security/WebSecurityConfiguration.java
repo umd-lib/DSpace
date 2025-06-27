@@ -149,6 +149,15 @@ public class WebSecurityConfiguration {
             .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", HttpMethod.GET.name(),
                                                        authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
+
+            // UMD Customization
+            // Add a filter before our CAS endpoints to do authentication
+            // based on the data in the HTTP request.
+            .addFilterBefore(new CASLoginFilter("/api/authn/cas", authenticationManager(),
+                                                restAuthenticationService),
+                             LogoutFilter.class)
+            // End UMD Customization
+
             // Add a filter before our ORCID endpoints to do the authentication based on the data in the HTTP request.
             // This endpoint only responds to GET as the actual authentication is performed by ORCID, which then
             // redirects to this endpoint to forward the authentication data to DSpace.

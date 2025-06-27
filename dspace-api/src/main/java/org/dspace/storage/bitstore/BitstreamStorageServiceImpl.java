@@ -402,6 +402,25 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
         while (allBitstreamsInSource.hasNext()) {
             Bitstream bitstream = allBitstreamsInSource.next();
+
+            // UMD Customization
+            // This customization was added to support migrating the asset store
+            // files in the Kubernetes "sandbox", "test" and "qa" namespaces to
+            // AWS S3 and can be removed after the AWS S3 migration is complete.
+            BitStoreService bitstore = getStore(bitstream.getStoreNumber());
+            if (bitstore instanceof DSBitStoreService) {
+                DSBitStoreService dsBitstoreService = (DSBitStoreService) bitstore;
+                if (!dsBitstoreService.exists(bitstream)) {
+                    log.info("Skipping bitstream:" + bitstream.getID() +
+                        " from assetstore[" + assetstoreSource + "] " +
+                        "Name:" + bitstream.getName() +
+                        ", SizeBytes:" + bitstream.getSizeBytes() +
+                        " because it does not exist in the asset store!");
+                    continue;
+                }
+            }
+            // End UMD Customization
+
             log.info("Copying bitstream:" + bitstream
                 .getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] " +
                          "Name:" + bitstream
@@ -423,7 +442,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             //modulo
             if ((processedCounter % batchCommitSize) == 0) {
                 log.info("Migration Commit Checkpoint: " + processedCounter);
-                context.dispatchEvents();
+                // UMD Customization
+                // This change was provided to DSpace in Pull Request 10940
+                // This customization markers can be removed once the
+                // application has been upgraded to a DSpace version containing
+                // the pull request.
+                context.commit();
+                // End UMD Customizaton
             }
         }
 
