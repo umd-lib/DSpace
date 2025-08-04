@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/bash
 
 # load-etd-nightly
 #
@@ -7,47 +7,36 @@
 #
 
 # Get command-line arguments
-if ($#argv != 1) then
+if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <dir>"
     echo "    <dir>:    Directory containing Proquest ETD files"
-    exit 0
-endif
+    exit 1
+fi
 
-set datadir = `cd $argv[1]; pwd`
-set bindir  = `dirname $0`
-set incomingdir = $datadir/incoming
-set processeddir = $datadir/processed
+datadir=$(cd "$1"; pwd)
+bindir=$(dirname "$0")
+incomingdir="$datadir/incoming"
+processeddir="$datadir/processed"
 
 # Check for incoming files
-ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
-if ($status == 0) then
-  echo Files found in $incomingdir
+if ls "$incomingdir"/etdadmin_upload_*.zip &> /dev/null; then
+  echo "Files found in $incomingdir"
 
-  @ count = 0
-
-  foreach upload ($incomingdir/etdadmin_upload_*.zip)
-    set zipfile = `basename $upload`
+  for upload in "$incomingdir"/etdadmin_upload_*.zip; do
+    zipfile=$(basename "$upload")
 
     # Load the files from this archive
     echo
-    echo ======================================================================
-    echo Loading archive file: $incomingdir/$zipfile
-    $bindir/load-etd -i $incomingdir/$zipfile
+    echo "======================================================================"
+    echo "Loading archive file: $incomingdir/$zipfile"
+    "$bindir/load-etd" -i "$incomingdir/$zipfile"
 
     # Move archive to the processed directory
-    if (! -d $processeddir ) then
-      mkdir -p $processeddir
-    endif
+    if [ ! -d "$processeddir" ]; then
+      mkdir -p "$processeddir"
+    fi
     echo
-    echo ' ' Moving $zipfile to $processeddir
-    mv $incomingdir/$zipfile $processeddir
-
-    @ count = $count + 1
-  end
-endif
-
-
-
-
-
-
+    echo " Moving $zipfile to $processeddir"
+    mv "$incomingdir/$zipfile" "$processeddir"
+  done
+fi
