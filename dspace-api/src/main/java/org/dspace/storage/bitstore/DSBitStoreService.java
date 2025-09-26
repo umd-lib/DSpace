@@ -252,12 +252,17 @@ public class DSBitStoreService extends BaseBitStoreService {
         }
         File bitstreamFile = new File(bufFilename.toString());
         Path normalizedPath = bitstreamFile.toPath().normalize();
-        if (!normalizedPath.startsWith(baseDir.getAbsolutePath())) {
+        // UMD Customization
+        // An equivalent change was provided to DSpace in Pull Request 11347
+        // This change can be removed when updating to a version of DSpace that
+        // includes that pull request.
+        if (!normalizedPath.startsWith(baseDir.getCanonicalPath())) {
             log.error("Bitstream path outside of assetstore root requested:" +
                     "bitstream={}, path={}, assetstore={}",
-                    bitstream.getID(), normalizedPath, baseDir.getAbsolutePath());
+                    bitstream.getID(), normalizedPath, baseDir.getCanonicalPath());
             throw new IOException("Illegal bitstream path constructed");
         }
+        // End UMD Customization
         return bitstreamFile;
     }
 
