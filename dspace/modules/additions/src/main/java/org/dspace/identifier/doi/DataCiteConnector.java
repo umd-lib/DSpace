@@ -36,10 +36,11 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.client.DSpaceHttpClientFactory;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -449,7 +450,7 @@ public class DataCiteConnector
             case (422): {
                 log.warn("DataCite was unable to understand the XML we send.");
                 log.warn("DataCite Metadata API returned a http status code "
-                        + resp.getStatusCode() + ": " + resp.getContent());
+                             + " {}: {}", resp::getStatusCode, resp::getContent);
                 Format format = Format.getCompactFormat();
                 format.setEncoding("UTF-8");
                 XMLOutputter xout = new XMLOutputter(format);
@@ -727,7 +728,7 @@ public class DataCiteConnector
         httpContext.setCredentialsProvider(credentialsProvider);
 
         HttpEntity entity = null;
-        try ( CloseableHttpClient httpclient = HttpClientBuilder.create().build(); ) {
+        try (CloseableHttpClient httpclient = DSpaceHttpClientFactory.getInstance().build()) {
             HttpResponse response = httpclient.execute(req, httpContext);
 
             StatusLine status = response.getStatusLine();
@@ -837,7 +838,7 @@ public class DataCiteConnector
         }
 
         // parse the XML
-        SAXBuilder saxBuilder = new SAXBuilder();
+        SAXBuilder saxBuilder = XMLUtils.getSAXBuilder();
         Document doc = null;
         try {
             doc = saxBuilder.build(new ByteArrayInputStream(content.getBytes("UTF-8")));
