@@ -63,11 +63,21 @@ ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 WORKDIR $DSPACE_INSTALL
-# Expose Tomcat port
-EXPOSE 8080
+# Need host command for "[dspace]/bin/make-handle-config"
+# UMD Customization
+# Commenting out, because no need for "make-handle-config" in dev environment
+# RUN apt-get update \
+#     && apt-get install -y --no-install-recommends host \
+#     && apt-get purge -y --auto-remove \
+#     && rm -rf /var/lib/apt/lists/*
+# End UMD Customization
+# Expose Tomcat port (8080) & Handle Server HTTP port (8000)
+EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
-# Add csh and Perl libraries for scripts in /dspace/bin
+
+# UMD Customization
+ENV TZ=America/New_York
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         csh \
@@ -78,6 +88,7 @@ RUN apt-get update && \
 # Create the directories needed for Proquest ETD loading
 RUN mkdir -p $DSPACE_INSTALL/proquest/incoming $DSPACE_INSTALL/proquest/processed \
              $DSPACE_INSTALL/proquest/csv $DSPACE_INSTALL/proquest/marc
+# End UMD Customization
 
 # On startup, run DSpace Runnable JAR
 ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]

@@ -3,7 +3,7 @@
 # (Dockerfile.dev, Dockerfile.dev-additions)
 ARG JDK_VERSION=17
 
-FROM eclipse-temurin:${JDK_VERSION} AS ant_build
+FROM docker.io/eclipse-temurin:${JDK_VERSION} AS ant_build
 # Create the initial install deployment using ANT
 ENV ANT_VERSION=1.10.13
 ENV ANT_HOME=/tmp/ant-$ANT_VERSION

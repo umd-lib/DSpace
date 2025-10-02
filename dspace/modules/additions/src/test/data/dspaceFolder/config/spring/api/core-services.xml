@@ -134,7 +134,7 @@
     <bean class="org.dspace.content.CommunityGroupServiceImpl"/>
     <bean class="org.dspace.eperson.UnitServiceImpl"/>
     <!-- End UMD Customization -->
-
+    
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
@@ -163,6 +163,9 @@
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
+    <bean id="org.dspace.app.client.DSpaceHttpClientFactory" class="org.dspace.app.client.DSpaceHttpClientFactory"/>
+    <bean class="org.dspace.app.client.DSpaceProxyRoutePlanner"/>
+
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
     <bean class="org.dspace.content.ItemFilterServiceImpl"/>
@@ -173,4 +176,3 @@
     <bean class="org.dspace.correctiontype.service.impl.CorrectionTypeServiceImpl"/>
 
 </beans>
-
