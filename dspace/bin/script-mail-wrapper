@@ -65,10 +65,24 @@ echo LOG_FILE_PATH=\'$LOG_FILE_PATH\'
 echo SCRIPT_ARGUMENTS=\'$@\'
 
 # Call the script being wrapped
-$SCRIPT "$@" 2>&1 | tee "$LOG_FILE_PATH" || true
+
+# Temporary file to store the exit code from the subshell
+EXIT_CODE_FILE=$(mktemp)
+{
+  $SCRIPT "$@"
+  echo $? > "$EXIT_CODE_FILE"
+} 2>&1 | tee "$LOG_FILE_PATH"
+
+SCRIPT_EXIT_CODE=$(cat "$EXIT_CODE_FILE")
+rm "$EXIT_CODE_FILE"
+
+SUBJECT_LIST="$SCRIPT_BASENAME: $SERVER_TYPE"
+if [ $SCRIPT_EXIT_CODE -ne 0 ]; then
+  SUBJECT_LIST="$SCRIPT_BASENAME: $SERVER_TYPE - ERROR(S) OCCURRED"
+fi
 
 # Mail the log, passing all non-JSON unchanged, and filtering out DEBUG messages
 jq -R -r '. as $line | try (fromjson | select(."log.level" != "DEBUG") | .message) catch $line' $LOG_FILE_PATH | \
-$MAIL_SCRIPT_DIR/mail -s "$SCRIPT_BASENAME: $SERVER_TYPE" "$EMAIL_ADDRESS"
+$MAIL_SCRIPT_DIR/mail -s "$SUBJECT_LIST" "$EMAIL_ADDRESS"
 
 echo Done running `basename $0` script

@@ -205,7 +205,7 @@ public class EtdLoader {
      */
 
     public static void main(String args[]) throws Exception {
-
+        boolean hasError = false;
         try {
 
             // Properties
@@ -289,12 +289,21 @@ public class EtdLoader {
             context.complete();
         } catch (ZipEntryTooLarge zetl) {
             log.error(zetl.getMessage());
+            hasError = true;
         } catch (Exception e) {
             log.error("Uncaught exception: " + e.getMessage(), e);
+            hasError = true;
         } finally {
             log.info("=====================================\n"
                     + "Records read:    " + lRead + "\n" + "Records written: "
                     + lWritten + "\n" + "Embargoes:       " + lEmbargo);
+        }
+
+        // Exit with a status code of 1 if an error has occurred, to signal to
+        // the "load-etd" script that the item was not successfully processed.
+        if (hasError) {
+            log.error("Exiting with return code of 1");
+            System.exit(1);
         }
     }
 
