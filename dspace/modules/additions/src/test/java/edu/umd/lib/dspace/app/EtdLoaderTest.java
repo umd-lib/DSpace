@@ -119,6 +119,22 @@ public class EtdLoaderTest extends AbstractUnitTest {
         assertThat(logOutput, containsString("Embargoes:       1"));
         assertThat(logOutput, containsString("Embargoed until Tue Jun 26 00:00:00 IST 3027"));
     }
+
+    @Test
+    public void testMainMaxFileSizePropertyHandling() throws Exception {
+        int maxFileSize = 1000;
+        testEtdLoaderConfig.setEtdLoaderScriptProperties(
+            "/edu/umd/lib/dspace/app/etdadmin_upload_test_one_item.zip",
+            eperson, maxFileSize);
+
+        String[] args = new String[0];
+
+        EtdLoader.main(args);
+        String logOutput = etdLogger.getLog();
+        assertThat(logOutput, containsString("Records read:    0"));
+        assertThat(logOutput, containsString("Records written: 0"));
+        assertThat(logOutput, containsString("ERROR: Zip file entry too large"));
+    }
 }
 
 /**
@@ -204,7 +220,14 @@ class TestEtdLoaderConfiguration {
         System.setProperty("etdloader.zipfile", zipFile.getCanonicalPath());
         configurationService.setProperty("drum.etdloader.eperson", eperson.getEmail());
         configurationService.setProperty("drum.etdloader.collection", testCollection.getID().toString());
+        configurationService.setProperty("drum.etdloader.maxFileSize", "-1");
     }
+
+    public void setEtdLoaderScriptProperties(String etdZipFile, EPerson eperson, int maxFileSize) throws Exception {
+        setEtdLoaderScriptProperties(etdZipFile, eperson);
+        configurationService.setProperty("drum.etdloader.maxFileSize", "" + maxFileSize);
+    }
+
 
     protected void addMetadataField(Context context, String metadataSchemaName, String element, String qualifier)
         throws Exception {

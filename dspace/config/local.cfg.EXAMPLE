@@ -405,6 +405,9 @@ drum.eperson.subscription.limiteperson =
 drum.etdloader.eperson = load_diss@drum.umd.edu
 # UUID of "UMD Theses and Dissertations" collection
 drum.etdloader.collection = ba3ddc3f-7a58-4fd3-bde5-304938050ea2
+# Maximum (uncompressed) size of an entry in an ETD Zip file (in bytes)
+# Comment out, or use -1 for unlimited
+drum.etdloader.maxFileSize=15032385536
 
 # Environment Banner configuration
 # Leave blank on production environment
