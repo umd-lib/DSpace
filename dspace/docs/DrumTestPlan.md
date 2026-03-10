@@ -41,7 +41,6 @@ The HAL Browser "Explorer" page will be displayed.
   * embargo-list
   * etdunits
   * units
-  * wufoo-feedback
 
 ### 2) DRUM Home Page
 
@@ -75,28 +74,24 @@ button and verify that additional entries are displayed for the sublist.
 
 2.4) At the bottom of the page, verify that the footer has the following links:
 
-* "Send Feedback"
 * "Privacy policy"
 * "Web Accessibility"
 * "Give Now"
 * "Cookie settings"
 
-2.4.1) Left-click the "Send Feedback" link in the footer. Verify that the
-browser is redirected to a Wufoo form.
-
-2.4.2) Go back to the DRUM home page, and left-click the "Privacy policy" link.
+2.4.1) Go back to the DRUM home page, and left-click the "Privacy policy" link.
 Verify that a "Privacy Statement" page is displayed, with a link to privacy
 policy on the UMD Libraries website.
 
-2.4.3) Go back to the DRUM home page, and left-click the "Web Accessibility"
+2.4.2) Go back to the DRUM home page, and left-click the "Web Accessibility"
 link. Verify that the web accessibility page on the university website is
 displayed.
 
-2.4.4) Go back to the DRUM home page, and left-click the "Give Now" link.
+2.4.3) Go back to the DRUM home page, and left-click the "Give Now" link.
 Verify that the "Giving to Maryland" page on the university website is
 displayed.
 
-2.4.5) Go back to the DRUM home page, and left-click the "Cookie settings"
+2.4.4) Go back to the DRUM home page, and left-click the "Cookie settings"
 link. Verify that an "Information that we collect" modal dialog is displayed.
 Left-click the "privacy policy" link in the modal dialog, and verify that the
 "Privacy Statement" page is displayed, with a link to privacy policy on the
