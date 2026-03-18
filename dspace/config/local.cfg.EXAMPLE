@@ -432,4 +432,9 @@ data.community.handle = 1903/27669
 # Equitable Access Policy
 # The handle for the "Equitable Access Policy" community
 equitable_access_policy.community.handle = 1903/29474
+
+# Batch Metadata export
+# Intended to allow an unlimited number of items by setting the number to be
+# larger than the total number of items in DRUM.
+bulkedit.export.max.items = 999999
 # End UMD Customization
