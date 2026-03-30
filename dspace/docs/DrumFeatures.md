@@ -86,12 +86,13 @@ See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 * LIBDRUM-683 - JSON-LD "Dataset" descriptor added for "Dataset" items (used by
   Google Dataset Search)
 
-## WuFoo Feedback Form
+## Send Feedback Form
 
-See [dspace/docs/DrumWufooFeedback.md](DrumWufooFeedback.md) for additional
-information.
+Disabled the "Send Feedback" link in the footer (see LIBDRUM-1007)
 
-* LIBDRUM-748 - Wufoo feedback form was added.
+Note: Up to (and including) 8.2-drum-1, DRUM used a Wufoo feedback form for
+gathering feedback (see LIBDRUM-748). This functionality was removed in
+LIBDRUM-1007.
 
 ## User Interface Changes
 

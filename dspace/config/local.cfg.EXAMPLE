@@ -153,8 +153,10 @@ mail.from.address = drum@drumlocal
 
 # When feedback is submitted via the Feedback form, it is sent to this address
 # Currently limited to one recipient!
+# if this property is empty or commented out, feedback form is disabled
 # UMD Customization
-feedback.recipient = mohideen@umd.edu
+# Setting to empty to override "feedback.recipient" value in "dspace.cfg"
+feedback.recipient =
 # End UMD Customization
 
 # General site administration (Webmaster) e-mail
@@ -411,20 +413,6 @@ drum.etdloader.collection = ba3ddc3f-7a58-4fd3-bde5-304938050ea2
 # Valid options: local, dev, stage
 drum.environment.name = local
 drum.environment.bannerText = Local Environment
-
-# LIBDRUM-563
-# Wufoo Feedback Form Embed
-# Required
-wufoo.feedback.formUrl = https://libumd.wufoo.com/forms/
-wufoo.feedback.formHash = r12gwaic1xvrtzs
-# Optional
-wufoo.feedback.field.email = Field1
-wufoo.feedback.field.page = Field7
-wufoo.feedback.field.eperson = Field10
-wufoo.feedback.field.agent = Field8
-wufoo.feedback.field.date = Field13
-wufoo.feedback.field.session = Field11
-wufoo.feedback.field.host = Field15
 
 # Data Community
 data.community.handle = 1903/27669
