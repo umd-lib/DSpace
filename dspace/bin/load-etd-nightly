@@ -18,6 +18,8 @@ bindir=$(dirname "$0")
 incomingdir="$datadir/incoming"
 processeddir="$datadir/processed"
 
+error_occurred=0
+
 # Check for incoming files
 if ls "$incomingdir"/etdadmin_upload_*.zip &> /dev/null; then
   echo "Files found in $incomingdir"
@@ -29,7 +31,16 @@ if ls "$incomingdir"/etdadmin_upload_*.zip &> /dev/null; then
     echo
     echo "======================================================================"
     echo "Loading archive file: $incomingdir/$zipfile"
+
     "$bindir/load-etd" -i "$incomingdir/$zipfile"
+
+    # If an error occurs, continue with the next item, leaving the file with
+    # the error in the "incoming" directory.
+    if [ $? -gt 0 ]; then
+      echo "Error: Failed to load $zipfile. Continuing with the next file."
+      error_occurred=1
+      continue
+    fi
 
     # Move archive to the processed directory
     if [ ! -d "$processeddir" ]; then
@@ -40,3 +51,5 @@ if ls "$incomingdir"/etdadmin_upload_*.zip &> /dev/null; then
     mv "$incomingdir/$zipfile" "$processeddir"
   done
 fi
+
+exit $error_occurred

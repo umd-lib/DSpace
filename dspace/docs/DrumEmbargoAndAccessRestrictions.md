@@ -94,7 +94,7 @@ system simply relies on those administrators maintaining both policies.
 
 When ingesting ETD items from ProQuest, the bitstreams will either have no
 embargo, or a specific date for lifting the embargo. For embargoed items, the
-ETD loaded  automatically adds both policies.
+ETD loader automatically adds both policies.
 
 ### Embargo List
 

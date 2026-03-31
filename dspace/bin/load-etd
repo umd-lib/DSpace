@@ -45,9 +45,11 @@ $ENV{CLASSPATH} .= $classpath_separator.$prev_classpath if ($prev_classpath ne "
 
 #print $ENV{JAVA_OPTS};
 #print (join ' ',@cmd) . "\n";
-system(@cmd);
 
-exit 0;
+# Using ">> 8" to recover the actual Java exit status code
+$exit_status = system(@cmd) >> 8;
+
+exit $exit_status;
 
 
 ########################################################## GetCmdLine

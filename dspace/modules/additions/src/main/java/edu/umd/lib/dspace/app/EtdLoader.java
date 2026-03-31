@@ -123,6 +123,12 @@ public class EtdLoader {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdLoader.class);
 
+    /**
+     * Configuration property for setting the maximum file size that can
+     * be processed.
+     */
+    public static final String MAX_FILE_SIZE_CONFIG_PROP = "drum.etdloader.maxFileSize";
+
     // Suppress default constructor
     private EtdLoader() {
     }
@@ -146,6 +152,10 @@ public class EtdLoader {
     static Collection etdcollection = null;
 
     static EPerson etdeperson = null;
+
+    // Maximum ZipEntry file size that can processed. Defaults to -1, which
+    // is unlimited.
+    static long maxFileSizeInBytes = -1L;
 
     static SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 
@@ -195,7 +205,7 @@ public class EtdLoader {
      */
 
     public static void main(String args[]) throws Exception {
-
+        boolean hasError = false;
         try {
 
             // Properties
@@ -210,6 +220,9 @@ public class EtdLoader {
                     .getProperty("drum.etdloader.eperson");
             String strCollection = configurationService
                     .getProperty("drum.etdloader.collection");
+
+            String maxFileSizeStr = configurationService
+                    .getProperty(MAX_FILE_SIZE_CONFIG_PROP, "-1");
 
             log.info("DSpace directory : " + strDspace);
             log.info("ETD Loaeder Eperson : " + strEPerson);
@@ -242,6 +255,19 @@ public class EtdLoader {
                         + strEPerson);
             }
 
+            if ((maxFileSizeStr == null) || maxFileSizeStr.isBlank()) {
+                throw new Exception(MAX_FILE_SIZE_CONFIG_PROP + " not set");
+            }
+            try {
+                maxFileSizeInBytes = Long.parseLong(maxFileSizeStr);
+            } catch (NumberFormatException nfe) {
+                throw new Exception(
+                    "%s of '%s' is not parseable as an integer".formatted(
+                        MAX_FILE_SIZE_CONFIG_PROP, maxFileSizeStr
+                    )
+                );
+            }
+
             // Open the zipfile
             ZipFile zip = new ZipFile(new File(strZipFile), ZipFile.OPEN_READ);
 
@@ -261,12 +287,23 @@ public class EtdLoader {
             }
 
             context.complete();
+        } catch (ZipEntryTooLarge zetl) {
+            log.error(zetl.getMessage());
+            hasError = true;
         } catch (Exception e) {
             log.error("Uncaught exception: " + e.getMessage(), e);
+            hasError = true;
         } finally {
             log.info("=====================================\n"
                     + "Records read:    " + lRead + "\n" + "Records written: "
                     + lWritten + "\n" + "Embargoes:       " + lEmbargo);
+        }
+
+        // Exit with a status code of 1 if an error has occurred, to signal to
+        // the "load-etd" script that the item was not successfully processed.
+        if (hasError) {
+            log.error("Exiting with return code of 1");
+            System.exit(1);
         }
     }
 
@@ -790,6 +827,24 @@ public class EtdLoader {
 
             Matcher m = pZipEntry.matcher(s[0]);
             if (m.matches()) {
+                if (!isFileSizeWithinLimit(ze, maxFileSizeInBytes)) {
+                    long uncompressedSize = ze.getSize();
+                    String msg = """
+                        ===============================================
+                        ERROR: Zip file entry too large
+
+                        The file '%s' in '%s'
+                        is too large at %d bytes, exceeding the limit
+                        of %d bytes set in the '%s'
+                        configuration property.
+                        Skipping.
+                        ===============================================
+                        """.formatted(
+                            strFileName, zip.getName(), uncompressedSize,
+                            maxFileSizeInBytes, MAX_FILE_SIZE_CONFIG_PROP
+                        );
+                    throw new ZipEntryTooLarge(msg);
+                }
 
                 // Get the item number
                 if (strItem == null) {
@@ -816,6 +871,27 @@ public class EtdLoader {
         map.put(strItem, lmap);
 
         return map;
+    }
+
+    /**
+     * Returns true if the ZipEntry is less than or equal to the given
+     * maximum file size limit, false otherwise.
+     *
+     * The maximum file size is typically controlled by the
+     * MAX_FILE_SIZE_CONFIG_PROP configuration parameter.
+     *
+     * @param ze the ZipEntry to examine
+     * @param maxFileSizeInBytes the maximum allows file size in bytes. Use
+     * -1 to indicate unlimited file size.
+     * @return
+     */
+    protected static boolean isFileSizeWithinLimit(ZipEntry ze, long maxFileSizeInBytes) {
+        // Negative number indicates unlimited file size
+        if (maxFileSizeInBytes < 0) {
+            return true;
+        }
+
+        return ze.getSize() <= maxFileSizeInBytes;
     }
 
     /**************************************************** reportCollections */
@@ -887,4 +963,14 @@ public class EtdLoader {
         return sw.toString();
     }
 
+}
+
+/**
+ * Exception thrown when the uncompressed size of a ZipEntry in a Zip file
+ * exceeds the size specified in MAX_FILE_SIZE_CONFIG_PROP.
+ */
+class ZipEntryTooLarge extends RuntimeException {
+    public ZipEntryTooLarge(String message) {
+        super(message);
+    }
 }
