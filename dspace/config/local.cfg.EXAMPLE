@@ -396,12 +396,8 @@ usage-statistics.authorization.admin.usage=true
 #######################
 
 # ETD loader email settings
-drum.mail.etdmarc.recipient = mohideen@umd.edu
 drum.mail.etd.recipient = mohideen@umd.edu
 drum.mail.duplicate_title = mohideen@umd.edu
-
-# Used by daily subscription mailer
-drum.eperson.subscription.limiteperson =
 
 # Used by etd loader cron job
 drum.etdloader.eperson = load_diss@drum.umd.edu
