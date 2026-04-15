@@ -62,36 +62,40 @@ The DRUM home page will be displayed.
   * "Collections Organized by Department"
   * "UM Community-managed Collections"
 
-2.3) In the "UM Community-managed Collections" section:
+2.3) In the "Recent Submissions" section, verify that there is a
+     "Syndication Feed" button
+     (<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/rss.svg" width="12" height="12">)
 
-2.3.1) Left-click the "Show More" button. Additional entries for the list should
+2.4) In the "UM Community-managed Collections" section:
+
+2.4.1) Left-click the "Show More" button. Additional entries for the list should
 be displayed.
 
-2.3.2) Find the "MARAC Mid-Atlantic Regional Archives Conference" entry in the
+2.4.2) Find the "MARAC Mid-Atlantic Regional Archives Conference" entry in the
 list, and left-click the arrow to the left of the text to expand the sublist.
 Verify that the list contains a "Show More" button. Left-click the "Show More"
 button and verify that additional entries are displayed for the sublist.
 
-2.4) At the bottom of the page, verify that the footer has the following links:
+2.5) At the bottom of the page, verify that the footer has the following links:
 
 * "Privacy policy"
 * "Web Accessibility"
 * "Give Now"
 * "Cookie settings"
 
-2.4.1) Go back to the DRUM home page, and left-click the "Privacy policy" link.
+2.5.1) Go back to the DRUM home page, and left-click the "Privacy policy" link.
 Verify that a "Privacy Statement" page is displayed, with a link to privacy
 policy on the UMD Libraries website.
 
-2.4.2) Go back to the DRUM home page, and left-click the "Web Accessibility"
+2.5.2) Go back to the DRUM home page, and left-click the "Web Accessibility"
 link. Verify that the web accessibility page on the university website is
 displayed.
 
-2.4.3) Go back to the DRUM home page, and left-click the "Give Now" link.
+2.5.3) Go back to the DRUM home page, and left-click the "Give Now" link.
 Verify that the "Giving to Maryland" page on the university website is
 displayed.
 
-2.4.4) Go back to the DRUM home page, and left-click the "Cookie settings"
+2.5.4) Go back to the DRUM home page, and left-click the "Cookie settings"
 link. Verify that an "Information that we collect" modal dialog is displayed.
 Left-click the "privacy policy" link in the modal dialog, and verify that the
 "Privacy Statement" page is displayed, with a link to privacy policy on the
