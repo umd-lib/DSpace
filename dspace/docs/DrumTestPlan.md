@@ -404,7 +404,7 @@ need to refresh the page).
 
 13.1) In a web browser, go to
 
-<https://drum-test.lib.umd.edu/oai/request?verb=Identify>
+<https://api.drum-test.lib.umd.edu/server/oai/request?verb=Identify>
 
 and verify that a “DSpace OAI-PMH Data Provider” page with repository
 information is displayed.
@@ -457,7 +457,7 @@ are displayed with information about the dataset and the DRUM website.
 
 15.1) In a web browser, go to
 
-<https://drum-test.lib.umd.edu/open-search/discover?query=author:smith>
+<https://api.drum-test.lib.umd.edu/server/opensearch/search?query=author:smith>
 
 and verify that an XML file can be downloaded, and contains item information.
 
