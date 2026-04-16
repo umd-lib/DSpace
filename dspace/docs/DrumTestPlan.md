@@ -170,17 +170,17 @@ The "New item" modal dialog will be displayed.
 
 6.3) Upload a PDF file to the page by dragging and dropping it onto the page.
 
-6.4) Change the "Type" dropdown in the "Submission Type" panel to "Article".
+6.4) Change the "Type" dropdown in the "Describe" panel to "Article".
 Verify that an additional "Equitable Access" dropdown with the label
 
 > Is this article being submitted to comply with the "Equitable Access to
 > Scholarly Articles Authored by University Faculty"
 > (<https://equitableaccess.umd.edu/>) policy?"
 
-is added to the "Submission Type" panel.
+is displayed.
 
 6.5) Change the "Type" dropdown to "Book". Verify that the "Equitable Access"
-dropdown field is removed from the "Submission Type" panel.
+dropdown field is removed.
 
 6.6) Fill out the following fields:
 
