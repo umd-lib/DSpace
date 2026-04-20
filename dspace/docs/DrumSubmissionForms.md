@@ -16,6 +16,7 @@ process.
 * LIBDRUM-729
 * LIBDRUM-747
 * LIBDRUM-876
+* LIBDRUM-909
 
 ## Submission Forms
 
@@ -132,14 +133,28 @@ DSpace:
 
 ### Equitable Access Submission Form Changes
 
-Both the default and MHHEA submission forms have a "Submission Type" step that
-contains the "Type" field.
-
 In the default submission form, selecting "Article" in the "Type" field
 dynamically displays the "Equitable Access" field.
 
 In the MHHEA form, the "Equitable Access" field is never displayed, as MHHEA
 submissions are never added to the "Equitable Access Policy" collection.
+
+The disparate treatment of the "Equitable Access" between the default and MHHEA
+submission forms is handled by having completely separate configurations for
+these forms (see "umdDescribe" and "mhheaDescribe" in
+"dspace/config/submission-forms.xml").
+
+Each form definition has a "custom" and "common" section. The "custom" section
+in each definition handles the "Equitable Access" field. The "common" section
+in each definition are the fields that are the same in both forms.
+
+Keeping the two "common" sections in sync must be done manually.
+
+**Note:** The initial implementation of the "Equitable Access" functionality in
+LIBDRUM-876 used separate submission form configurations to handle the "custom"
+(Type, Equitable Access) functionality and a single "common" configuration for
+the remaining fields. Unfortunately, this resulted in issues such as
+LIBDRUM-909, in which required field warnings were not being displayed.
 
 ### "local.equitableAccessSubmission" metadata field
 
