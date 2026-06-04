@@ -131,13 +131,7 @@ public final class CheckerCommand {
                 collector.collect(context, info);
             }
 
-            // UMD Customization
-            // This change was provided to DSpace in Pull Request 10508
-            // This customization markers can be removed once the
-            // application has been upgraded to a DSpace version containing
-            // the pull request.
             context.commit();
-            // End UMD Customization
             bitstream = dispatcher.next();
         }
     }

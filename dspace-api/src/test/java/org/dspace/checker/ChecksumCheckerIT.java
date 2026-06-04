@@ -35,15 +35,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * UMD Customization
- *
- * A modified version of this class was provided to DSpace in
- * Pull Request 10508.
- *
- * This class should be replaced with the DSpace version, once this application
- * has been upgraded to a DSpace version containing the pull request.
- */
 public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
     protected List<Bitstream> bitstreams;
     protected MostRecentChecksumService checksumService =
@@ -83,12 +74,12 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         // a random order. To verify that the expected bitstreams were
         // processed, reset the timestamps so that the bitstreams are
         // checked in a specific order (oldest first).
-        Date checksumInstant = Date.from(Instant.ofEpochMilli(0));
+        Instant checksumInstant = Instant.ofEpochMilli(0);
         for (Bitstream bitstream: bitstreams) {
             MostRecentChecksum mrc = checksumService.findByBitstream(context, bitstream);
-            mrc.setProcessStartDate(checksumInstant);
-            mrc.setProcessEndDate(checksumInstant);
-            checksumInstant = new Date(checksumInstant.getTime() + 10000);
+            mrc.setProcessStartDate(Date.from(checksumInstant));
+            mrc.setProcessEndDate(Date.from(checksumInstant));
+            checksumInstant = checksumInstant.plusSeconds(10);
         }
         context.commit();
     }

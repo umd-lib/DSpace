@@ -38,13 +38,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-/**
- * UMD Customization
- *
- * This class was provided to DSpace in Pull Request 10940
- * This comment can be removed once this application has been upgraded to a
- * DSpace version containing the pull request.
- */
 public class BitstreamStorageServiceImplIT extends AbstractIntegrationTestWithDatabase {
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private BitstreamStorageServiceImpl bitstreamStorageService =

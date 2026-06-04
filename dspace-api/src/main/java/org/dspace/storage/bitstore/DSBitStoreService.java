@@ -19,9 +19,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Native DSpace (or "Directory Scatter" if you prefer) asset store.
@@ -252,17 +254,15 @@ public class DSBitStoreService extends BaseBitStoreService {
         }
         File bitstreamFile = new File(bufFilename.toString());
         Path normalizedPath = bitstreamFile.toPath().normalize();
-        // UMD Customization
-        // An equivalent change was provided to DSpace in Pull Request 11347
-        // This change can be removed when updating to a version of DSpace that
-        // includes that pull request.
-        if (!normalizedPath.startsWith(baseDir.getCanonicalPath())) {
+        String[] allowedAssetstoreRoots = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getArrayProperty("assetstore.allowed.roots", new String[]{});
+        if (!normalizedPath.startsWith(baseDir.getCanonicalPath())
+            && !StringUtils.startsWithAny(normalizedPath.toString(), allowedAssetstoreRoots)) {
             log.error("Bitstream path outside of assetstore root requested:" +
                     "bitstream={}, path={}, assetstore={}",
                     bitstream.getID(), normalizedPath, baseDir.getCanonicalPath());
             throw new IOException("Illegal bitstream path constructed");
         }
-        // End UMD Customization
         return bitstreamFile;
     }
 
@@ -277,18 +277,4 @@ public class DSBitStoreService extends BaseBitStoreService {
     public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
     }
-
-    // UMD Customization
-    // This customization was added to support migrating the asset store
-    // files in the Kubernetes "sandbox", "test" and "qa" namespaces to
-    // AWS S3 and can be removed after the AWS S3 migration is complete.
-    public boolean exists(Bitstream bitstream)
-        throws IOException {
-        File file = getFile(bitstream);
-        if (file == null) {
-            return false;
-        }
-        return file.exists();
-    }
-    // End UMD Customization
 }
