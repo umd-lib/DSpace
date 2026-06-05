@@ -117,7 +117,7 @@ public class EtdLoaderTest extends AbstractUnitTest {
         String logOutput = etdLogger.getLog();
         assertThat(logOutput, containsString("Records written: 1"));
         assertThat(logOutput, containsString("Embargoes:       1"));
-        assertThat(logOutput, containsString("Embargoed until Tue Jun 26 00:00:00 IST 3027"));
+        assertThat(logOutput, containsString("Embargoed until Tue Jun 26 00:00:00 UTC 3027"));
     }
 }
 

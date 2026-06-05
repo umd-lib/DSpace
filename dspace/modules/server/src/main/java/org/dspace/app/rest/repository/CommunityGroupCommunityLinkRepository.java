@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CommunityGroupRest;
