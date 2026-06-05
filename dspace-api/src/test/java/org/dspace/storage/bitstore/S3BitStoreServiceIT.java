@@ -55,6 +55,7 @@ import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -67,6 +68,9 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 /**
  * @author Luca Giamminonni (luca.giamminonni at 4science.com)
  */
+// UMD Customization
+@Ignore("UMD - These tests consistently fail when run on Jenkins, see https://github.com/DSpace/DSpace/pull/11900")
+// End UMD Customization
 public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     private static  S3MockContainer s3Mock = new S3MockContainer("4.8.0");
 
