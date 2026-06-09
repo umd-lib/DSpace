@@ -88,8 +88,8 @@ RUN apt-get update && \
         jq
 
 # Create the directories needed for Proquest ETD loading
-RUN mkdir -p $DSPACE_INSTALL/proquest/incoming $DSPACE_INSTALL/proquest/processed \
-             $DSPACE_INSTALL/proquest/csv $DSPACE_INSTALL/proquest/marc
+RUN mkdir -p $dspace__P__dir/proquest/incoming $dspace__P__dir/proquest/processed \
+             $dspace__P__dir/proquest/csv $dspace__P__dir/proquest/marc
 # End UMD Customization
 # On startup, run DSpace Runnable JAR (uses the "dspace.dir" setting defined in "dspace__P__dir" env variable)
 ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar"]
