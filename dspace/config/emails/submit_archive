@@ -14,7 +14,8 @@ Your submission has been accepted and archived in ${config.get('dspace.shortname
 and it has been assigned the following identifier:
 ${params[2]}
 
-Please use this identifier when citing your submission.
+A DOI will be registered within 24 hours. Please use this identifier when citing
+your submission.
 
 Many thanks!
 
