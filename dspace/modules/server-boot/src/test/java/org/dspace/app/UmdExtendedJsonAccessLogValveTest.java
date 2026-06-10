@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -244,6 +245,7 @@ public class UmdExtendedJsonAccessLogValveTest {
         when(mockRequest.getCoyoteRequest()).thenReturn(mockCoyoteRequest);
         // Arbitrarily set "time" at epoch start
         when(mockCoyoteRequest.getStartTime()).thenReturn(0l);
+        when(mockCoyoteRequest.getStartInstant()).thenReturn(Instant.ofEpochSecond(0l));
 
         // Set up the mock Response to return expected values
         when(mockRequest.getRemoteHost()).thenReturn(remoteIP);
@@ -266,7 +268,8 @@ public class UmdExtendedJsonAccessLogValveTest {
         when(mockRequest.getHeaders("User-Agent")).thenReturn(enumUserAgent);
 
         // Invoke the logging logic of the JsonAccessLogValve
-        valve.log(mockRequest, mockResponse, bytes);
+        long requestDuration = 42l; // Number is arbitrary
+        valve.log(mockRequest, mockResponse, requestDuration);
     }
 
     /**

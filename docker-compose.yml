@@ -5,6 +5,8 @@ networks:
         # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
         - subnet: 172.23.0.0/16
+    # Explicitly set external=false because this script creates the network.
+    external: false
 services:
   # UMD Customization
   # Nginx server configuration for supporting HTTPS connections from the
@@ -29,26 +31,31 @@ services:
       # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
       # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
-      # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
-      dspace__P__dir: /dspace
-      # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
+      # Uncomment to set a non-default value for dspace.dir, dspace.server.url or dspace.ui.url
+      # dspace__P__dir: /dspace
       # UMD Customization
       dspace__P__server__P__url: https://api.drum-local.lib.umd.edu/server
       dspace__P__ui__P__url: https://drum-local.lib.umd.edu:4000
       # End UMD Customization
-      dspace__P__name: 'DSpace Started with Docker Compose'
+      # Set SSR URL to the Docker container name so that UI can contact container directly in Production mode.
+      # (This is necessary for docker-compose-angular.yml as it uses production mode by default)
+      dspace__P__server__P__ssr__P__url: ${dspace__P__server__P__ssr__P__url:-http://dspace:8080/server}
+      dspace__P__name: ${dspace__P__name:-DSpace Started with Docker Compose}
+      # UMD Customization
+      # Customization for Matomo - remove when updating to DSpace 9 or later
+      # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
+      matomo__P__tracker__P__url: ${matomo__P__tracker__P__url:-http://matomo}
+      # End UMD Customization
       # db.url: Ensure we are using the 'dspacedb' image for our database
       # UMD Customization
-      db__P__url: 'jdbc:postgresql://dspacedb:5432/drum'
+      db__P__url: ${db__P__url:-jdbc:postgresql://dspacedb:5432/drum}
       # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
-      solr__P__server: http://dspacesolr:8983/solr
-      # matomo.tracker.url: Ensure we are using the 'matomo' image for Matomo
-      matomo__P__tracker__P__url: http://matomo
+      solr__P__server: ${solr__P__server:-http://dspacesolr:8983/solr}
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
-      proxies__P__trusted__P__ipranges: '172.23.0'
-      LOGGING_CONFIG: /dspace/config/log4j2-container.xml
+      proxies__P__trusted__P__ipranges: ${proxies__P__trusted__P__ipranges:-172.23.0}
+      LOGGING_CONFIG: ${LOGGING_CONFIG:-/dspace/config/log4j2-container.xml}
       # UMD Customization
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
       # End UMD Customization
@@ -69,8 +76,6 @@ services:
       target: 8080
     - published: 8000
       target: 8000
-    stdin_open: true
-    tty: true
     volumes:
     # Keep DSpace assetstore directory between reboots
     - assetstore:/dspace/assetstore
@@ -88,7 +93,7 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       # UMD Customization
-      java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
+      java $${JPDA_OPTS} -jar /dspace/webapps/server-boot.jar
       # End UMD Customization
   # DSpace PostgreSQL database container
   dspacedb:
@@ -112,8 +117,6 @@ services:
     ports:
     - published: 5432
       target: 5432
-    stdin_open: true
-    tty: true
     volumes:
     # Keep Postgres data directory between reboots
     - pgdata:/pgdata
@@ -136,8 +139,6 @@ services:
     ports:
     - published: 8983
       target: 8983
-    stdin_open: true
-    tty: true
     working_dir: /var/solr/data
     volumes:
     # Keep Solr data directory between reboots

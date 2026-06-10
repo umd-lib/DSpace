@@ -306,8 +306,7 @@ RUN apt-get update && \
       libconfig-properties-perl \
       jq \
     && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkfifo /var/spool/postfix/public/pickup
+    && rm -rf /var/lib/apt/lists/*
 # End Dependencies for email functionality
 ```
 

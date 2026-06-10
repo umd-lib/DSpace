@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>8.1-drum-3-SNAPSHOT</version>
+      <version>8.4-drum-0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -359,5 +359,4 @@
       </dependency>
       <!-- End UMD Customization -->
    </dependencies>
-
 </project>
