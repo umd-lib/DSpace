@@ -20,7 +20,7 @@ services:
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
       # db.url: Ensure we are using the 'dspacedb' image for our database
       # UMD Customization
-      db__P__url: {db__P__url:-jdbc:postgresql://dspacedb:5432/drum}
+      db__P__url: ${db__P__url:-jdbc:postgresql://dspacedb:5432/drum}
       # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: ${solr__P__server:-http://dspacesolr:8983/solr}
