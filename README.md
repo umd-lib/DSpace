@@ -116,6 +116,8 @@ Confluence for information about setting up a MacBook to use the Kubernetes
 
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
   base DSpace functionality
+* [DrumTestPlan](dspace/docs/DrumTestPlan.md) - Covers some manual tests for
+customized features and deployment configurations.
 * [DrumConfigurationCustomization](dspace/docs/DrumConfigurationCustomization.md) -
   Information about customizing DSpace for DRUM.
 * [docs](dspace/docs) - additional documentation
