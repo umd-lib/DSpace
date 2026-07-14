@@ -1,130 +1,153 @@
+# Digital Repository at the University of Maryland (DRUM)
 
-# DSpace
+Home: <https://drum.lib.umd.edu/>
 
-[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
+## Documentation
 
-[DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
-[DSpace Releases](https://github.com/DSpace/DSpace/releases) |
-[DSpace Wiki](https://wiki.lyrasis.org/display/DSPACE/Home) |
-[Support](https://wiki.lyrasis.org/display/DSPACE/Support)
+The original DSpace documentation is in the upstream [DSpace
+repository](https://github.com/DSpace/DSpace)
+[README.md](https://github.com/DSpace/DSpace/blob/main/README.md) file.
 
-## Overview
+## Development Environment
 
-DSpace open source software is a turnkey repository application used by more than
-2,000 organizations and institutions worldwide to provide durable access to digital resources.
-For more information, visit http://www.dspace.org/
+Instructions for building and running drum locally can be found in
+[dspace/docs/DockerDevelopmentEnvironment.md](/dspace/docs/DockerDevelopmentEnvironment.md)
 
-DSpace consists of both a Java-based backend and an Angular-based frontend.
+## Building Images for K8s Deployment
 
-* Backend (this codebase) provides a REST API, along with other machine-based interfaces (e.g. OAI-PMH, SWORD, etc)
-    * The REST Contract is at https://github.com/DSpace/RestContract
-* Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
+As of May 2023,  MacBooks utilizing Apple Silicon (the "arm64" architecture)
+are unable to directly generate the "amd64" Docker images used by Kubernetes.
 
-Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 and above.
-* A maintenance branch for older versions is still available, see `dspace-6_x` for 6.x maintenance.
+The following procedure uses the Docker "buildx" functionality and the
+Kubernetes "build" namespace to build the Docker images. This procedure should
+work on both "arm64" and "amd64" MacBooks.
 
-## Downloads
+All images will be automatically pushed to the Nexus.
 
-* Backend (REST API): https://github.com/DSpace/DSpace/releases
-* Frontend (User Interface): https://github.com/DSpace/dspace-angular/releases
+### Local Machine Setup
 
-## Documentation / Installation
+See <https://confluence.umd.edu/display/LIB/Docker+Builds+in+Kubernetes> in
+Confluence for information about setting up a MacBook to use the Kubernetes
+"build" namespace.
 
-Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
+### Creating the Docker images
 
-The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC8x/Installing+DSpace
+1) In an empty directory, checkout the Git repository and switch into the
+   directory:
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
-and a servlet container (usually Tomcat) in order to function.
-More information about these and all other prerequisites can be found in the Installation instructions above.
+    ```bash
+    $ git clone git@github.com:umd-lib/DSpace.git drum
+    $ cd drum
+    ```
 
-## Running DSpace 8 in Docker
+2) Checkout the appropriate Git tag, branch, or commit for the Docker images.
 
-NOTE: At this time, we do not have production-ready Docker images for DSpace.
-That said, we do have quick-start Docker Compose scripts for development or testing purposes.
+3) Set up a "DRUM_TAG" environment variable:
 
-See [Running DSpace 8 with Docker Compose](dspace/src/main/docker-compose/README.md)
+    ```bash
+    $ export DRUM_TAG=<DOCKER_IMAGE_TAG>
+    ```
 
-## Contributing
+   where \<DOCKER_IMAGE_TAG> is the Docker image tag to associate with the
+   Docker images. This will typically be the Git tag for the DRUM version,
+   or some other identifier, such as a Git commit hash. For example, using the
+   Git tag of "8.2-drum-0":
 
-See [Contributing documentation](CONTRIBUTING.md)
+    ```bash
+    $ export DRUM_TAG=8.2-drum-0
+    ```
 
-## Getting Help
+4) Set up a "DRUM_DIR" environment variable referring to the current
+   directory:
 
-DSpace provides public mailing lists where you can post questions or raise topics for discussion.
-We welcome everyone to participate in these lists:
+    ```bash
+    $ export DRUM_DIR=`pwd`
+    ```
 
-* [dspace-community@googlegroups.com](https://groups.google.com/d/forum/dspace-community) : General discussion about DSpace platform, announcements, sharing of best practices
-* [dspace-tech@googlegroups.com](https://groups.google.com/d/forum/dspace-tech) : Technical support mailing list. See also our guide for [How to troubleshoot an error](https://wiki.lyrasis.org/display/DSPACE/Troubleshoot+an+error).
-* [dspace-devel@googlegroups.com](https://groups.google.com/d/forum/dspace-devel) : Developers / Development mailing list
+5) Switch to the Kubernetes "build" namespace:
 
-Great Q&A is also available under the [DSpace tag on Stackoverflow](http://stackoverflow.com/questions/tagged/dspace)
+    ```bash
+    $ kubectl config use-context build
+    ```
 
-Additional support options are at https://wiki.lyrasis.org/display/DSPACE/Support
+6) Create the "docker.lib.umd.edu/drum-dependencies-8_x" Docker image. This
+   image is used to pre-cache Maven downloads that will be used in subsequent
+   DSpace docker builds:
 
-DSpace also has an active service provider network. If you'd rather hire a service provider to
-install, upgrade, customize, or host DSpace, then we recommend getting in touch with one of our
-[Registered Service Providers](https://dspace.org/registered-service-providers/).
+    ```bash
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-8_x:latest -f Dockerfile.dependencies .
+    ```
 
-## Issue Tracker
+7) Create the "docker.lib.umd.edu/drum" Docker image:
 
-DSpace uses GitHub to track issues:
-* Backend (REST API) issues: https://github.com/DSpace/DSpace/issues
-* Frontend (User Interface) issues: https://github.com/DSpace/dspace-angular/issues
+    ```bash
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum:$DRUM_TAG .
+    ```
 
-## Testing
+8) Create the "docker.lib.umd.edu/dspace-postgres", which is a Postgres image
+   with "pgcrypto" module:
 
-### Running Tests
+    **Note:** The "Dockerfile" for the "dspace-postgres" image specifies
+    only the major Postgres version as the base image. This allows Postgres
+    minor version updates to be retrieved automatically. It may not be
+    necessary to create new "dspace-postgres" image versions for every DRUM
+    patch or hotfix version increment.
 
-By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
-run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild) for all Pull Requests and code commits.
+    ```bash
+    $ cd $DRUM_DIR/dspace/src/main/docker/dspace-postgres-pgcrypto
 
-* How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
-  ```
-  mvn install -DskipUnitTests=false -DskipIntegrationTests=false
-  ```
-* How to run _only_ Unit Tests:
-  ```
-  mvn test -DskipUnitTests=false
-  ```
-* How to run a *single* Unit Test
-  ```
-  # Run all tests in a specific test class
-  # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/dspace-postgres:$DRUM_TAG .
+    ```
 
-  # Run one test method in a specific test class
-  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
-  ```
-* How to run _only_ Integration Tests
-  ```
-  mvn install -DskipIntegrationTests=false
-  ```
-* How to run a *single* Integration Test
-  ```
-  # Run all integration tests in a specific test class
-  # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
+9) Create the "docker.lib.umd.edu/drum-solr":
 
-  # Run one test method in a specific test class
-  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
-  ```
-* How to run only tests of a specific DSpace module
-  ```
-  # Before you can run only one module's tests, other modules may need to be installed into your ~/.m2
-  cd [dspace-src]
-  mvn clean install
+    **Note:** The "Dockerfile" for the "drum-solr" image specifies only the
+    major Solr version as the base image. This allows Solr minor version updates
+    to be retrieved automatically. It may not be necessary to create new
+    "drum-solr" image versions for every DRUM patch or hotfix version increment.
 
-  # Then, move into a module subdirectory, and run the test command
-  cd [dspace-src]/dspace-server-webapp
-  # Choose your test command from the lists above
-  ```
+    ```bash
+    $ cd $DRUM_DIR/dspace/solr
+
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum-solr:$DRUM_TAG .
+    ```
+
+### Features
+
+* [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
+  base DSpace functionality
+* [DrumConfigurationCustomization](dspace/docs/DrumConfigurationCustomization.md) -
+  Information about customizing DSpace for DRUM.
+* [docs](dspace/docs) - additional documentation
+
+## Customization Markings
+
+UMD customizations to stock DSpace code should be marked, if possible, with
+a starting comment "UMD Customization" and an ending comment of
+"End UMD Customization", for example, in a Java file:
+
+```java
+// UMD Customization
+... New or modified code ...
+// End UMD Customization
+```
+
+The following customizations *do not* need to be commented:
+
+* Updates to the "\<version>" identifier in "pom.xml" files
+* "Branding" changes in email templates such as "dspace/config/emails/" or
+  the default DSpace license in "dspace/config/default.license", as these files
+  do not have a convenient "comment" mechanism
+* Files that do not have a "comment" mechanism, such as JSON files
+* Extremely trivial whitespace changes unrelated to UMD customizations, such as
+  tabs in the modified DSpace file being automatically converted to spaces by
+  VS Code, or an end-of-file line.
+
+The main goal is to make it immediately when performing DSpace version upgrades
+whether a change in a file is due to an explicit UMD customization.
 
 ## License
 
-DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).
-The full license is available in the [LICENSE](LICENSE) file or online at http://www.dspace.org/license/
-
-DSpace uses third-party libraries which may be distributed under different licenses. Those licenses are listed
-in the [LICENSES_THIRD_PARTY](LICENSES_THIRD_PARTY) file.
+See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations
+(Apache 2.0). This license only governs the part of code base developed at UMD.
+The DSpace license can be found at <https://github.com/DSpace/DSpace>
