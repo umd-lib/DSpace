@@ -112,7 +112,7 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum-solr:$DRUM_TAG .
     ```
 
-### Features
+## Features
 
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
   base DSpace functionality
