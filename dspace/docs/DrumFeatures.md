@@ -36,7 +36,6 @@ See [dspace/docs/DrumEtdLoader.md](DrumEtdLoader.md) for additional information.
 * LIBDRUM-671 - "ETD Department" CRUD functionality
 * LIBDRUM-680 - Loader for loading ProQuest ETDs into DRUM
   * transform ProQuest metadata to dublin core
-  * transform ProQuest metadata to marc and transfer to TSD
   * map into department etd collection
   * email notification
 
