@@ -123,6 +123,7 @@ LIBDRUM-1007.
 * LIBDRUM-746 - "Abstract" field modified to not preserve line breaks when
   displayed
 * LIBDRUM-844 - Disable "By Subject Category" Browse option
+* LIBDRUM-1033 - "About DRUM" link (with associated page) added to navigation bar
 
 ## DRUM DOI
 
