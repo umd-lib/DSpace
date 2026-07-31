@@ -55,6 +55,8 @@ The DRUM home page will be displayed.
 * The UMD favicon is displayed in the browser tab, and that the text in
   the browser tab is "DRUM :: Home"
 * The appropriate SSDR environment banner is displayed.
+* There is an "About Drum" link in the navigation bar, immediately after the
+  logo that links to the "About DRUM" page
 * The lower half of the page contains two columns:
   * "List of Communities"
   * "Recent Submissions"
