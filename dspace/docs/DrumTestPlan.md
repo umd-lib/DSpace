@@ -205,7 +205,13 @@ entries (but do not select either of them):
 * Creative Commons
 
 In the "Deposit license" section, left-click the "I confirm the license above"
-checkbox, and then left-click the "Deposit" button. A notification will be
+checkbox to select it.
+
+In the "Accessibility" section, left-click the accessibility acknowledgment in
+the "Accessibility" section to select it, and then left-click the "Deposit"
+button.
+
+A notification will be
 displayed indicating that the item was successfully deposited. The
 "My submissions" page will be displayed.
 

@@ -5,7 +5,7 @@
   - An empty registry for instance-specific, local metadata. Any non-standard
   - metadata fields should be added here to avoid polluting the standard
   - namespaces.
-  - 
+  -
   -->
 <dspace-dc-types>
 
@@ -38,6 +38,14 @@
     <element>equitableAccessSubmission</element>
     <qualifier></qualifier>
     <scope_note>Indicates whether item is being submitted in compliance with the UMD "Equitable Access" policy</scope_note>
+  </dc-type>
+  <dc-type>
+    <schema>local</schema>
+    <element>accessibility</element>
+    <qualifier>acknowledged</qualifier>
+    <scope_note>
+      Indicates that the submitter has acknowledged submission is subject to the DRUM Accessibility policy.
+    </scope_note>
   </dc-type>
   <!-- End UMD Customization -->
 
