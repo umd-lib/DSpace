@@ -2817,7 +2817,7 @@
         </value-pairs>
         <value-pairs value-pairs-name="umd_accessibility_acknowledgment" dc-term="accessibility">
           <pair>
-            <displayed-value>I acknowledge that my submission is subject to the accessibility requirements under the terms of the DRUM Accessibility Policy.</displayed-value>
+            <displayed-value>I confirm I have reviewed DRUM's Accessibility (https://drum.lib.umd.edu/info/drum-about#accessibility) requirements and will work with DRUM administrators to ensure my deposited materials are digitally accessible.</displayed-value>
             <stored-value>true</stored-value>
           </pair>
         </value-pairs>
