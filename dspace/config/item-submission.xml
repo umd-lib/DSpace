@@ -466,9 +466,9 @@
             <step id="collection"/>
             <step id="umdDescribe"/>
             <step id="upload"/>
+            <step id="umdAccessibility"/>
             <step id="cclicense"/>
             <step id="license"/>
-            <step id="umdAccessibility"/>
         </submission-process>
 
         <!--This "MHHEA-submission" process replaces the DEFAULT item submission
@@ -478,9 +478,9 @@
             <step id="collection"/>
             <step id="mhheaDescribe"/>
             <step id="optionalUpload"/>
+            <step id="umdAccessibility"/>
             <step id="cclicense"/>
             <step id="license"/>
-            <step id="umdAccessibility"/>
         </submission-process>
         <!-- End UMD Customization -->
     </submission-definitions>
