@@ -254,6 +254,12 @@
             <type>submission-form</type>
         </step-definition>
 
+        <step-definition id="umdAccessibility" mandatory="true">
+            <heading>submit.progressbar.umdAccessibility</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <step-definition id="mhheaDescribe" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -460,6 +466,7 @@
             <step id="collection"/>
             <step id="umdDescribe"/>
             <step id="upload"/>
+            <step id="umdAccessibility"/>
             <step id="cclicense"/>
             <step id="license"/>
         </submission-process>
@@ -471,6 +478,7 @@
             <step id="collection"/>
             <step id="mhheaDescribe"/>
             <step id="optionalUpload"/>
+            <step id="umdAccessibility"/>
             <step id="cclicense"/>
             <step id="license"/>
         </submission-process>

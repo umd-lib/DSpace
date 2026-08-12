@@ -1716,6 +1716,21 @@
             <!-- End Common section for "umdDescribe"-->
         </form>
 
+        <form name="umdAccessibility">
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>accessibility</dc-element>
+                    <dc-qualifier>acknowledged</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Accessibility Acknowledgment</label>
+                    <input-type value-pairs-name="umd_accessibility_acknowledgment">list</input-type>
+                    <hint></hint>
+                    <required>You must confirm that you have reviewed DRUM's Accessibility requirements.</required>
+                </field>
+            </row>
+        </form>
+
         <!--
           "Describe" form for MHHEA (Minority Health and Health Equity Archive)
           submissions.
@@ -2799,6 +2814,12 @@
                 <displayed-value>Other</displayed-value>
                 <stored-value>Other</stored-value>
             </pair>
+        </value-pairs>
+        <value-pairs value-pairs-name="umd_accessibility_acknowledgment" dc-term="accessibility">
+          <pair>
+            <displayed-value>I confirm I have reviewed DRUM's Accessibility requirements (https://lib.guides.umd.edu/accessible-scholarship).</displayed-value>
+            <stored-value>true</stored-value>
+          </pair>
         </value-pairs>
         <!-- End UMD Customization -->
 

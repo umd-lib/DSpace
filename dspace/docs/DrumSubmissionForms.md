@@ -17,6 +17,7 @@ process.
 * LIBDRUM-747
 * LIBDRUM-876
 * LIBDRUM-909
+* LIBDRUM-1036
 
 ## Submission Forms
 
@@ -187,3 +188,16 @@ steps, and modified the "finaleditstep" to go to the "umdcollectionmapping" when
 it completes. Modifying the "finaleditstep" appears to be necessary –
 despite how it may seem from the documentation - as the workflow steps to not
 naturally progress through all the steps in the list.
+
+## Accessibility Form Changes
+
+An "Accessibility" panel was added with a required field that the user must
+select acknowledging that the submission is subject to the DRUM accessibility
+policy.
+
+### "local.accessibility.acknowledged" metadata field
+
+A "local.accessibility.acknowledged" metadata field was added to track the
+user's response to the accessibility acknowledgment question on the submission
+form. This metadata field, when populated, should always be "true", and
+shows up in the "Full item page" view for the item.

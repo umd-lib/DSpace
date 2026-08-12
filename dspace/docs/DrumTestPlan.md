@@ -198,6 +198,9 @@ dropdown field is removed.
 | Title | SSDR Test Item |
 | Date of Issue | <Enter "2025" in the "Year" field> |
 
+In the "Accessibility" section, left-click the accessibility
+confirmation to select it.
+
 Verify that the "Creative commons license" section has a dropdown with two
 entries (but do not select either of them):
 
@@ -205,9 +208,10 @@ entries (but do not select either of them):
 * Creative Commons
 
 In the "Deposit license" section, left-click the "I confirm the license above"
-checkbox, and then left-click the "Deposit" button. A notification will be
-displayed indicating that the item was successfully deposited. The
-"My submissions" page will be displayed.
+checkbox to select it, and then left-click the "Deposit" button
+
+A notification will be displayed indicating that the item was successfully
+deposited. The "My submissions" page will be displayed.
 
 6.7) On the "My submissions" page, verify that the item has been added as one
 of the submissions. Left-click the "View" button for the submitted item. The
