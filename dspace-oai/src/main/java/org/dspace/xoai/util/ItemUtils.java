@@ -105,6 +105,26 @@ public class ItemUtils {
 
         bs = item.getBundles();
         for (Bundle b : bs) {
+            // UMD Customization
+            // Bundles other than ORIGINAL are internal (METADATA, LICENSE, ...) and must not
+            // be advertised to harvesters unless they are genuinely readable by Anonymous.
+            // Without this, the raw ProQuest ETD metadata held in the METADATA bundle -- which
+            // carries student PII -- was published to any anonymous harvester, filename and
+            // download URL included, regardless of resource policy.
+            //
+            // ORIGINAL is deliberately left unfiltered: embargoed content must continue to
+            // appear with its resource-policy metadata (see addResourcePolicyInformation),
+            // which OpenAIRE and other aggregators rely on for embargo dates.
+            //
+            // Safe to evaluate here because the OAI indexer builds these documents under an
+            // unauthenticated Context (XOAI.main -> new Context(Context.Mode.READ_ONLY)), so
+            // authorizeActionBoolean resolves against the Anonymous group.
+            if (!Constants.DEFAULT_BUNDLE_NAME.equals(b.getName())
+                    && !authorizeService.authorizeActionBoolean(context, b, Constants.READ)) {
+                continue;
+            }
+            // End UMD Customization
+
             Element bundle = create("bundle");
             bundles.getElement().add(bundle);
             bundle.getField().add(createValue("name", b.getName()));
@@ -118,6 +138,17 @@ public class ItemUtils {
                     log.error("Null bitstream found, check item uuid: " + item.getID());
                     break;
                 }
+
+                // UMD Customization
+                // Same rule at bitstream granularity: a readable internal bundle may still
+                // hold individually restricted bitstreams. ORIGINAL stays unfiltered so that
+                // embargoed bitstreams keep their resource-policy metadata.
+                if (!Constants.DEFAULT_BUNDLE_NAME.equals(b.getName())
+                        && !authorizeService.authorizeActionBoolean(context, bit, Constants.READ)) {
+                    continue;
+                }
+                // End UMD Customization
+
                 boolean primary = false;
                 // Check if current bitstream is in original bundle + 1 of the 2 following
                 // Bitstream = primary bitstream in bundle -> true
