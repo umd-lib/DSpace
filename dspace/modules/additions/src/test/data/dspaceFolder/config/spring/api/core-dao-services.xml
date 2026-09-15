@@ -40,6 +40,7 @@
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.RegistrationDataMetadataDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 
@@ -68,7 +69,7 @@
     <bean class="org.dspace.eperson.dao.impl.UnitDAOImpl"/>
     <!-- End UMD Customization -->
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
-
+ 	
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
