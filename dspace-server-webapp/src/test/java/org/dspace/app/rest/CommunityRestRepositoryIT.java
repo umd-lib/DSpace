@@ -99,6 +99,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private Community topLevelCommunityA;
     private Community subCommunityA;
     private Community communityB;
@@ -118,7 +121,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Test
     public void createTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         CommunityRest commNoembeds = new CommunityRest();
         // We send a name but the created community should set this to the title
@@ -228,7 +230,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         // We send a name but the created community should set this to the title
         comm.setName("Test Sub-Level Community");
@@ -268,7 +269,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         // We send a name but the created community should set this to the title
         comm.setName("Test Sub-Level Community");
@@ -341,7 +341,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void createUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         comm.setName("Test Top-Level Community");
 
@@ -726,7 +725,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
         String response = result.getResponse().getContentAsString();
         JSONArray communities = new JSONObject(response).getJSONObject("_embedded").getJSONArray("communities");
@@ -1677,8 +1675,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.turnOffAuthorisationSystem();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
@@ -1901,8 +1897,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.turnOffAuthorisationSystem();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
@@ -2025,7 +2019,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/communities/"
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/communities/"
                 + parentCommunity.getID(), expectedStatus);
     }
 
@@ -2033,7 +2027,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void createTestInvalidParentCommunityBadRequest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
         // We send a name but the created community should set this to the title
         comm.setName("Test Top-Level Community");
@@ -2736,7 +2729,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         AtomicReference<UUID> idRef = new AtomicReference<>();
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(post("/api/core/communities/" + subCommunity.getID() + "/adminGroup")

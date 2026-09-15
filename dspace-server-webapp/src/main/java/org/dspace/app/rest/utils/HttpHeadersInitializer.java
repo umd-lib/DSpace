@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -41,6 +42,7 @@ public class HttpHeadersInitializer {
         MULTIPART_BOUNDARY;
     public static final String CONTENT_DISPOSITION_INLINE = "inline";
     public static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
+    public static final String CONTENT_DISPOSITION = "Content-Disposition";
     private static final String IF_NONE_MATCH = "If-None-Match";
     private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
     private static final String ETAG = "ETag";
@@ -54,7 +56,6 @@ public class HttpHeadersInitializer {
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     private static final String IMAGE = "image";
     private static final String ACCEPT = "Accept";
-    private static final String CONTENT_DISPOSITION = "Content-Disposition";
     private static final String CONTENT_DISPOSITION_FORMAT = "%s;filename=\"%s\"";
     private static final String CACHE_CONTROL = "Cache-Control";
 
@@ -151,7 +152,7 @@ public class HttpHeadersInitializer {
         }
         httpHeaders.put(LAST_MODIFIED, Collections.singletonList(FastHttpDateFormat.formatDate(lastModified)));
         httpHeaders.put(EXPIRES, Collections.singletonList(FastHttpDateFormat.formatDate(
-            System.currentTimeMillis() + DEFAULT_EXPIRE_TIME)));
+            Instant.now().toEpochMilli() + DEFAULT_EXPIRE_TIME)));
 
         //No-cache so that we can log every download
         httpHeaders.put(CACHE_CONTROL, Collections.singletonList(CACHE_CONTROL_SETTING));

@@ -71,7 +71,7 @@ public class AbstractDSpaceIntegrationTest {
     @BeforeClass
     public static void initTestEnvironment() {
         try {
-            //Stops System.exit(0) throws exception instead of exitting
+            //Stops System.exit(0) throws exception instead of exiting
             System.setSecurityManager(new NoExitSecurityManager());
 
             // All tests should assume UTC timezone by default (unless overridden in the test itself)

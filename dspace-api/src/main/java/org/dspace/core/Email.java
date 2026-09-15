@@ -17,9 +17,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -339,6 +339,7 @@ public class Email {
      */
     public void send() throws MessagingException, IOException {
         build();
+
         boolean disabled = getConfigurationService().getBooleanProperty("mail.server.disabled", false);
         if (disabled) {
             LOG.info(format(message, body));
@@ -408,8 +409,8 @@ public class Email {
         body = writer.toString();
 
         // Set some message header fields
-        Date date = new Date();
-        message.setSentDate(date);
+        Instant date = Instant.now();
+        message.setSentDate(java.util.Date.from(date));
         message.setFrom(new InternetAddress(from));
 
         for (String headerName : templateHeaders) {
@@ -572,10 +573,12 @@ public class Email {
      *              message is sent.
      */
     public static void main(String[] args) {
-        String to = getConfigurationService().getProperty("mail.admin");
+        ConfigurationService config
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
-        String server = getConfigurationService().getProperty("mail.server");
-        String url = getConfigurationService().getProperty("dspace.ui.url");
+        String server = config.getProperty("mail.server");
+        String url = config.getProperty("dspace.ui.url");
         Email message;
         try {
             if (args.length <= 0) {

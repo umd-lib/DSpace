@@ -9,9 +9,8 @@ package org.dspace.app.checker;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -160,7 +159,7 @@ public final class ChecksumChecker {
                                        + " old results from the database.");
             }
 
-            Date processStart = Calendar.getInstance().getTime();
+            Instant processStart = Instant.now();
 
             BitstreamDispatcher dispatcher = null;
 
@@ -191,10 +190,8 @@ public final class ChecksumChecker {
                 // run checker process for specified duration
                 try {
                     dispatcher = new LimitedDurationDispatcher(
-                        new SimpleDispatcher(context, processStart, true), new Date(
-                        System.currentTimeMillis()
-                            + Utils.parseDuration(line
-                                                      .getOptionValue('d'))));
+                        new SimpleDispatcher(context, processStart, true), Instant.ofEpochMilli(
+                        Instant.now().toEpochMilli() + Utils.parseDuration(line.getOptionValue('d'))));
                 } catch (Exception e) {
                     System.err.println("Couldn't parse " + line.getOptionValue('d')
                                   + " as a duration");

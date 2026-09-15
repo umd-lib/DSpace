@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -479,7 +480,7 @@ public class DSpaceCSV implements Serializable {
         List<Collection> collections = i.getCollections();
         for (Collection c : collections) {
             // Only add if it is not the owning collection
-            if (!c.getHandle().equals(owningCollectionHandle)) {
+            if (!Objects.equals(c.getHandle(), owningCollectionHandle)) {
                 line.add("collection", c.getHandle());
             }
         }
@@ -497,7 +498,7 @@ public class DSpaceCSV implements Serializable {
                 key = key + "." + metadataField.getQualifier();
             }
 
-            // Add the language if there is one (schema.element.qualifier[langauge])
+            // Add the language if there is one (schema.element.qualifier[language])
             //if ((value.language != null) && (!"".equals(value.language)))
             if (value.getLanguage() != null) {
                 key = key + "[" + value.getLanguage() + "]";

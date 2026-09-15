@@ -36,6 +36,25 @@ public interface RequestItemDAO extends GenericDAO<RequestItem> {
      */
     public RequestItem findByToken(Context context, String token) throws SQLException;
 
+    /**
+     * Fetch a request named by its unique access token (passed in emails).
+     * Note this is the token used by the requester to access an approved resource, not the token
+     * used by the item submitter or helpdesk to grant the access.
+     *
+     * @param context the current DSpace context.
+     * @param accessToken uniquely identifies the request
+     * @return the found request or {@code null}
+     * @throws SQLException passed through.
+     */
+    public RequestItem findByAccessToken(Context context, String accessToken) throws SQLException;
+
+    /**
+     * Fetch requests by item
+     *
+     * @param context current DSpace session.
+     * @param item the item to find requests for.
+     * @return the matching requests (or empty iterator)
+     */
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
 
     /**

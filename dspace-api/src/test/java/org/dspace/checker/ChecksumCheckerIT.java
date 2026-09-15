@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -77,8 +76,8 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         Instant checksumInstant = Instant.ofEpochMilli(0);
         for (Bitstream bitstream: bitstreams) {
             MostRecentChecksum mrc = checksumService.findByBitstream(context, bitstream);
-            mrc.setProcessStartDate(Date.from(checksumInstant));
-            mrc.setProcessEndDate(Date.from(checksumInstant));
+            mrc.setProcessStartDate(checksumInstant);
+            mrc.setProcessEndDate(checksumInstant);
             checksumInstant = checksumInstant.plusSeconds(10);
         }
         context.commit();
@@ -101,14 +100,14 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         CheckerCommand checker = new CheckerCommand(context);
 
         // The start date to use for the checker process
-        Date checkerStartDate = Date.from(Instant.now());
+        Instant checkerStartDate = Instant.now();
 
         // Verify that all checksums are before the checker start date
         for (Bitstream bitstream: bitstreams) {
             MostRecentChecksum checksum = checksumService.findByBitstream(context, bitstream);
-            Date lastChecksumDate = checksum.getProcessStartDate();
+            Instant lastChecksumDate = checksum.getProcessStartDate();
             assertTrue("lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")",
-                lastChecksumDate.before(checkerStartDate));
+                lastChecksumDate.isBefore(checkerStartDate));
         }
 
         // Dispatcher that throws an exception when a third bitstream is
@@ -134,15 +133,15 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
         int bitstreamCount = 0;
         for (Bitstream bitstream: bitstreams) {
             MostRecentChecksum checksum = checksumService.findByBitstream(context, bitstream);
-            Date lastChecksumDate = checksum.getProcessStartDate();
+            Instant lastChecksumDate = checksum.getProcessStartDate();
 
             bitstreamCount = bitstreamCount + 1;
             if (bitstreamCount <= 2) {
                 assertTrue("lastChecksumDate (" + lastChecksumDate + ") <= checkerStartDate (" + checkerStartDate + ")",
-                    lastChecksumDate.after(checkerStartDate));
+                    lastChecksumDate.isAfter(checkerStartDate));
             } else {
                 assertTrue("lastChecksumDate (" + lastChecksumDate + ") >= checkerStartDate (" + checkerStartDate + ")",
-                    lastChecksumDate.before(checkerStartDate));
+                    lastChecksumDate.isBefore(checkerStartDate));
             }
         }
     }
@@ -168,7 +167,7 @@ public class ChecksumCheckerIT extends AbstractIntegrationTestWithDatabase {
          * @param maxNextCalls the number of "next" method calls to allow before
          * throwing a SQLException.
          */
-        public ExpectionThrowingDispatcher(Context context, Date startTime, boolean looping, int maxNextCalls) {
+        public ExpectionThrowingDispatcher(Context context, Instant startTime, boolean looping, int maxNextCalls) {
             super(context, startTime, looping);
             this.maxNextCalls = maxNextCalls;
         }

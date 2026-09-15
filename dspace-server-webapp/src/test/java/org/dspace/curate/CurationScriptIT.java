@@ -66,6 +66,9 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ScriptService scriptService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final static String SCRIPTS_ENDPOINT = "/api/" + ScriptRest.CATEGORY + "/" + ScriptRest.PLURAL_NAME;
     private final static String CURATE_SCRIPT_ENDPOINT = SCRIPTS_ENDPOINT + "/curate/" + ProcessRest.PLURAL_NAME;
 
@@ -105,7 +108,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with -t <invalidTaskOption>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -126,7 +129,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with missing required -i <handle>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -148,7 +151,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with missing required -i <handle>
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -188,7 +191,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request without -t <task> or -T <taskFile> (and no -q <queue>)
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -210,7 +213,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with invalid -s <scope>; must be object, curation or open
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -233,7 +236,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         // Request with invalid -s <scope>; must be object, curation or open
         getClient(token)
             .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                         .param("properties", mapper.writeValueAsString(list)))
             // Illegal Argument Exception
             .andExpect(status().isBadRequest());
     }
@@ -275,7 +278,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
@@ -327,7 +330,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         try {
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
@@ -378,7 +381,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
             getClient(token)
                 .perform(multipart(CURATE_SCRIPT_ENDPOINT)
-                             .param("properties", new ObjectMapper().writeValueAsString(list)))
+                             .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
                                                 String.valueOf(admin.getID()), parameters,
@@ -501,7 +504,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // start a process as general admin
             getClient(adminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listCurateSite)))
+                                 .param("properties", mapper.writeValueAsString(listCurateSite)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -514,7 +517,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // check with the com admin
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listCom)))
+                                 .param("properties", mapper.writeValueAsString(listCom)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -526,7 +529,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // the com admin should be able to run the curate also over the children collection and item
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listCol)))
+                                 .param("properties", mapper.writeValueAsString(listCol)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -537,7 +540,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                             .set(read(result.getResponse().getContentAsString(), "$.processId")));
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listItem)))
+                                 .param("properties", mapper.writeValueAsString(listItem)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -549,25 +552,25 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // the com admin should be NOT able to run the curate over other com, col or items
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listCurateSite)))
+                                 .param("properties", mapper.writeValueAsString(listCurateSite)))
                     .andExpect(status().isForbidden());
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listAnotherCom)))
+                                 .param("properties", mapper.writeValueAsString(listAnotherCom)))
                     .andExpect(status().isForbidden());
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listAnotherCol)))
+                                 .param("properties", mapper.writeValueAsString(listAnotherCol)))
                     .andExpect(status().isForbidden());
             getClient(comAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listAnotherItem)))
+                                 .param("properties", mapper.writeValueAsString(listAnotherItem)))
                     .andExpect(status().isForbidden());
 
             // check with the col admin
             getClient(colAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listCol)))
+                                 .param("properties", mapper.writeValueAsString(listCol)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -579,7 +582,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // the col admin should be able to run the curate also over the owned item
             getClient(colAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listItem)))
+                                 .param("properties", mapper.writeValueAsString(listItem)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -593,25 +596,25 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // on a not owned item
             getClient(colAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listCurateSite)))
+                             .param("properties", mapper.writeValueAsString(listCurateSite)))
                 .andExpect(status().isForbidden());
             getClient(colAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listCom)))
+                             .param("properties", mapper.writeValueAsString(listCom)))
                 .andExpect(status().isForbidden());
             getClient(colAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listAnotherCol)))
+                             .param("properties", mapper.writeValueAsString(listAnotherCol)))
                 .andExpect(status().isForbidden());
             getClient(colAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listAnotherItem)))
+                                 .param("properties", mapper.writeValueAsString(listAnotherItem)))
                     .andExpect(status().isForbidden());
 
             // check with the item admin
             getClient(itemAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listItem)))
+                                 .param("properties", mapper.writeValueAsString(listItem)))
                     .andExpect(status().isAccepted())
                     .andExpect(jsonPath("$", is(
                             ProcessMatcher.matchProcess("curate",
@@ -624,19 +627,19 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // on a not owned item
             getClient(itemAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listCurateSite)))
+                             .param("properties", mapper.writeValueAsString(listCurateSite)))
                 .andExpect(status().isForbidden());
             getClient(itemAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listCom)))
+                             .param("properties", mapper.writeValueAsString(listCom)))
                 .andExpect(status().isForbidden());
             getClient(itemAdminToken)
                 .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                             .param("properties", new ObjectMapper().writeValueAsString(listCol)))
+                             .param("properties", mapper.writeValueAsString(listCol)))
                 .andExpect(status().isForbidden());
             getClient(itemAdminToken)
                     .perform(multipart("/api/system/scripts/" + curateScriptConfiguration.getName() + "/processes")
-                                 .param("properties", new ObjectMapper().writeValueAsString(listAnotherItem)))
+                                 .param("properties", mapper.writeValueAsString(listAnotherItem)))
                     .andExpect(status().isForbidden());
 
         } finally {

@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 // End UMD Customization
 
 /**
- * Define the Spring Boot Application settings itself to be runned using an
+ * Define the Spring Boot Application settings itself to be run using an
  * embedded application server.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)

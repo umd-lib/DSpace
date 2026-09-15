@@ -51,10 +51,10 @@ Confluence for information about setting up a MacBook to use the Kubernetes
    where \<DOCKER_IMAGE_TAG> is the Docker image tag to associate with the
    Docker images. This will typically be the Git tag for the DRUM version,
    or some other identifier, such as a Git commit hash. For example, using the
-   Git tag of "8.2-drum-0":
+   Git tag of "9.4-drum-0":
 
     ```bash
-    $ export DRUM_TAG=8.2-drum-0
+    $ export DRUM_TAG=9.4-drum-0
     ```
 
 4) Set up a "DRUM_DIR" environment variable referring to the current
@@ -70,12 +70,12 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ kubectl config use-context build
     ```
 
-6) Create the "docker.lib.umd.edu/drum-dependencies-8_x" Docker image. This
+6) Create the "docker.lib.umd.edu/drum-dependencies-9_x" Docker image. This
    image is used to pre-cache Maven downloads that will be used in subsequent
    DSpace docker builds:
 
     ```bash
-    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-8_x:latest -f Dockerfile.dependencies .
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-9_x:latest -f Dockerfile.dependencies .
     ```
 
 7) Create the "docker.lib.umd.edu/drum" Docker image:
@@ -84,22 +84,7 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum:$DRUM_TAG .
     ```
 
-8) Create the "docker.lib.umd.edu/dspace-postgres", which is a Postgres image
-   with "pgcrypto" module:
-
-    **Note:** The "Dockerfile" for the "dspace-postgres" image specifies
-    only the major Postgres version as the base image. This allows Postgres
-    minor version updates to be retrieved automatically. It may not be
-    necessary to create new "dspace-postgres" image versions for every DRUM
-    patch or hotfix version increment.
-
-    ```bash
-    $ cd $DRUM_DIR/dspace/src/main/docker/dspace-postgres-pgcrypto
-
-    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/dspace-postgres:$DRUM_TAG .
-    ```
-
-9) Create the "docker.lib.umd.edu/drum-solr":
+8) Create the "docker.lib.umd.edu/drum-solr":
 
     **Note:** The "Dockerfile" for the "drum-solr" image specifies only the
     major Solr version as the base image. This allows Solr minor version updates

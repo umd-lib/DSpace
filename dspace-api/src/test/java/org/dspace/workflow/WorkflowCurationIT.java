@@ -61,7 +61,6 @@ public class WorkflowCurationIT
             throws Exception {
         context.turnOffAuthorisationSystem();
         legacyPluginService.clearNamedPluginClasses();
-
         //** GIVEN **
 
         // A submitter;
