@@ -36,6 +36,9 @@
     <!-- Additional indexing plugin make filtering by has content in original bundle (like pdf's, images) posible via SOLR -->
     <bean id="hasContentInOriginalBundlePlugin" class="org.dspace.discovery.SolrServiceContentInOriginalBundleFilterPlugin"/>
 
+    <!-- Additional indexing plugin for geospatial data -->
+    <bean id="geospatialMetadataPlugin" class="org.dspace.discovery.SolrServiceGeospatialFilterPlugin"/>
+
     <!-- Additional indexing plugin enables searching by filenames and by file descriptions for files in ORIGINAL bundle -->
     <bean id="solrServiceFileInfoPlugin" class="org.dspace.discovery.SolrServiceFileInfoPlugin"/>
 
@@ -44,6 +47,9 @@
 
     <!-- Additional indexing plugin that normalises and indexes value(s) for comparison to be used in e.g. duplication detection -->
     <bean id="solrServiceIndexComparisonPlugin" class="org.dspace.discovery.SolrServiceIndexComparisonPlugin" scope="prototype"/>
+
+    <!-- Additional indexing plugin that enables filtering items by access status -->
+    <bean id="solrServiceIndexAccessStatusPlugin" class="org.dspace.discovery.SolrServiceIndexAccessStatusPlugin" scope="prototype"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
@@ -103,6 +109,8 @@
                 <!-- Same as the "journalvolume" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
                 <entry key="journalvolume-relationships" value-ref="journalVolumeRelationships"/>
+
+                <entry key="geospatial" value-ref="geospatialConfiguration"/>
 
                 <entry key="journal" value-ref="journal"/>
                 <!-- Same as the "journal" configuration, but does NOT filter out older versions of items -->
@@ -187,7 +195,9 @@
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
+                <!-- <ref bean="searchFilterHasGeospatialMetadata"/> -->
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterAccessStatus" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -202,12 +212,15 @@
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
+                <ref bean="searchFilterHasGeospatialMetadata" />
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterAccessStatus" />
                 <ref bean="searchFilterIsAuthorOfPublicationRelation"/>
                 <ref bean="searchFilterIsProjectOfPublicationRelation"/>
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterGeospatialPoint"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1905,6 +1918,59 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <!-- Geospatial configuration -->
+    <bean id="geospatialConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="geospatial"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterGeospatialPoint"/>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterGeospatialPoint"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <value>search.resourcetype:Item</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <!--The configuration for the recent submissions-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned"/>
+                <property name="type" value="date"/>
+                <property name="max" value="20"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <property name="useAsHomePage" value="false"/>
+            </bean>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10"/>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
     <bean id="journal" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
         <property name="id" value="journal"/>
@@ -2248,7 +2314,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
         <property name="id" value="NOTIFY.incoming"/>
         <property name="defaultFilterQueries">
@@ -2259,7 +2325,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming.accepted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.accepted"/>
         <property name="defaultFilterQueries">
@@ -2273,7 +2339,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming.processed" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.processed"/>
         <property name="defaultFilterQueries">
@@ -2285,7 +2351,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.failure"/>
         <property name="defaultFilterQueries">
@@ -2297,7 +2363,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming.untrusted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
         <property name="id" value="NOTIFY.incoming.untrusted"/>
         <property name="defaultFilterQueries">
@@ -2309,7 +2375,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.incoming.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.incoming.involvedItems"/>
         <property name="defaultFilterQueries">
@@ -2321,7 +2387,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
         <property name="id" value="NOTIFY.outgoing"/>
         <property name="defaultFilterQueries">
@@ -2332,7 +2398,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing.delivered" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.delivered"/>
         <property name="defaultFilterQueries">
@@ -2344,7 +2410,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing.queued" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.queued"/>
         <property name="defaultFilterQueries">
@@ -2356,7 +2422,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing.queued_for_retry" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.queued_for_retry"/>
         <property name="defaultFilterQueries">
@@ -2368,7 +2434,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
         <property name="id" value="NOTIFY.outgoing.failure"/>
         <property name="defaultFilterQueries">
@@ -2380,7 +2446,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean id="NOTIFY.outgoing.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.outgoing.involvedItems"/>
         <property name="defaultFilterQueries">
@@ -2609,7 +2675,22 @@
         <property name="isOpenByDefault" value="false"/>
         <property name="pageSize" value="10"/>
         <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
 
+    <!-- Spatial facet -->
+    <bean id="searchFilterGeospatialPoint" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="point"/>
+        <property name="type" value="text"/>
+        <property name="metadataFields">
+            <list>
+                <value>dcterms.spatial</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
     </bean>
 
     <bean id="searchFilterContentInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -2633,6 +2714,19 @@
         </property>
     </bean>
 
+    <bean id="searchFilterHasGeospatialMetadata" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="has_geospatial_metadata"/>
+        <property name="metadataFields">
+            <list/>
+        </property>
+        <property name="facetLimit" value="2"/>
+        <property name="type" value="standard"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
     <bean id="searchFilterFileDescriptionInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="original_bundle_descriptions"/>
         <property name="metadataFields">
@@ -2646,6 +2740,13 @@
             <list>
                 <value>dc.type</value>
             </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterAccessStatus" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="access_status" />
+        <property name="metadataFields">
+            <list/>
         </property>
     </bean>
 
@@ -3263,7 +3364,7 @@
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
     </bean>
-
+    
     <bean id="searchFilterNotifyLastStartTime" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="queue_last_start_time"/>
         <property name="metadataFields">
