@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -157,7 +157,8 @@ public class EtdLoader {
     // is unlimited.
     static long maxFileSizeInBytes = -1L;
 
-    static SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+    static DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
     static Pattern pZipEntry = Pattern
             .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
@@ -449,8 +450,9 @@ public class EtdLoader {
             rp.setAction(Constants.READ);
             lPolicies.add(rp);
         } else {
-            Date date = format.parse(strEmbargo);
-            log.info("Embargoed until " + date);
+            LocalDate date = LocalDate.parse(strEmbargo, format);
+
+            log.info("Embargoed until " + date.format(outputFormatter));
 
             rp = resourcePolicyService.create(context, null, etdgroup);
             rp.setAction(Constants.READ);

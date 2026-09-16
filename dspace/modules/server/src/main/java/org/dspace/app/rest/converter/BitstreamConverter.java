@@ -9,13 +9,11 @@ package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
 // UMD Customization
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 // End UMD Customization
 import java.util.List;
 
-// UMD Customization
-import org.apache.commons.lang3.time.DateFormatUtils;
-// End UMD Customization
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.projection.Projection;
@@ -122,9 +120,9 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
         ResourcePolicy etdEmbargoPolicy = getEtdEmbargo(object);
 
         if ((etdEmbargoPolicy != null) && (resourcePolicyService.isDateValid(etdEmbargoPolicy))) {
-            Date liftDate = etdEmbargoPolicy.getEndDate();
+            LocalDate liftDate = etdEmbargoPolicy.getEndDate();
             if (liftDate != null) {
-                return DateFormatUtils.format(liftDate, "yyyy-MM-dd");
+                return liftDate.format(DateTimeFormatter.ISO_LOCAL_DATE); // yyyy-MM-dd
             } else {
                 return "FOREVER";
             }

@@ -7,12 +7,13 @@ import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.common.base.Splitter;
 import org.apache.catalina.LifecycleState;
@@ -27,6 +28,9 @@ public class UmdExtendedJsonAccessLogValveTest {
     private TestableUmdExtendedJsonAccessLogValve valve;
     // Timestamps for requests will be epoch start (January 1, 1970)
     private String expectedTime = getTimestamp(0l);
+
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+      DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
 
     @Before
     public void setUp() throws Exception {
@@ -278,8 +282,9 @@ public class UmdExtendedJsonAccessLogValveTest {
      * @param epochMillis the number of milliseconds since the epoch
      */
     private String getTimestamp(long epochMillis) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
-        return formatter.format(new Date(epochMillis));
+        return Instant.ofEpochMilli(epochMillis)
+              .atZone(ZoneId.systemDefault())
+              .format(TIMESTAMP_FORMATTER);
     }
 }
 
