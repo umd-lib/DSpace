@@ -242,7 +242,12 @@ public class DOIOrganiser {
 
         if (line.hasOption('r')) {
             // UMD Customization
-            organiser.purgeEmptyDOIsWithStatus(context, DOIIdentifierProvider.TO_BE_REGISTERED);
+            try {
+                organiser.purgeEmptyDOIsWithStatus(context, DOIIdentifierProvider.TO_BE_REGISTERED);
+            } catch (SQLException ex) {
+                System.err.println("Error in database connection:" + ex.getMessage());
+                ex.printStackTrace(System.err);
+            }
             // End UMD Customization
             List<Integer> statuses = Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED);
             processBatched(context, doiService, statuses, organiser::register, "registration");
