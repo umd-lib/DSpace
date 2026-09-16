@@ -5,7 +5,7 @@
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
 # The Docker version tag to build from
-ARG DSPACE_VERSION=8_x-dev-base
+ARG DSPACE_VERSION=9_x-dev-base
 # The Docker registry to use for DSpace images. Defaults to "docker.io"
 # NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
 ARG DOCKER_REGISTRY=docker.io
@@ -80,6 +80,7 @@ ENV JAVA_OPTS=-Xmx2000m
 
 # UMD Customization
 ENV TZ=America/New_York
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         csh \
