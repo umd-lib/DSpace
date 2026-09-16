@@ -159,7 +159,7 @@ public class EtdLoader {
     static long maxFileSizeInBytes = -1L;
 
     static DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.US);
 
     static Pattern pZipEntry = Pattern
             .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
