@@ -41,6 +41,7 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -230,7 +231,7 @@ public class EtdLoader {
             log.info("ETD Loader Collection: " + strCollection);
 
             // the transformers
-            TransformerFactory tFactory = TransformerFactory.newInstance();
+            TransformerFactory tFactory = XMLUtils.getTransformerFactory();
             tDC = tFactory.newTransformer(new StreamSource(new File(strDspace
                     + "/config/load/etd2dc.xsl")));
 
