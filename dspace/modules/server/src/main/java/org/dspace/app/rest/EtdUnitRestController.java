@@ -77,8 +77,8 @@ public class EtdUnitRestController {
 
         Context context = obtainContext(request);
 
-        EtdUnit EtdUnit = etdunitService.find(context, uuid);
-        if (EtdUnit == null) {
+        EtdUnit etdUnit = etdunitService.find(context, uuid);
+        if (etdUnit == null) {
             throw new ResourceNotFoundException("EtdUnit is not found for uuid: " + uuid);
         }
 
@@ -94,10 +94,10 @@ public class EtdUnitRestController {
         }
 
         for (Collection collection : collections) {
-            etdunitService.addCollection(context, EtdUnit, collection);
+            etdunitService.addCollection(context, etdUnit, collection);
         }
 
-        etdunitService.update(context, EtdUnit);
+        etdunitService.update(context, etdUnit);
         context.complete();
 
         response.setStatus(SC_NO_CONTENT);

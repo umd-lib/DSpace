@@ -12,7 +12,6 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CommunityGroupRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
@@ -38,9 +37,6 @@ import org.springframework.stereotype.Component;
 @Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.PLURAL_NAME + "." + CommunityGroupRest.COMMUNITIES)
 public class CommunityGroupCommunityLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(CommunityGroupCommunityLinkRepository.class);
 
     @Autowired
     SearchService searchService;

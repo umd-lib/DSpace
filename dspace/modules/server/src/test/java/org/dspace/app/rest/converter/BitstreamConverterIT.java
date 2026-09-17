@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testgetEmbargoRestriction_ReturnsEndDate_WhenEtdEmbargoPolicyWithEndDateInFuture() throws Exception {
-        LocalDate futureDate = LocalDate.now().plusYears(1);
+        LocalDate futureDate = LocalDate.now(ZoneOffset.UTC).plusYears(1);
 
         String expectedDateStr = asDate.format(futureDate);
         etdEmbargoPolicy.setEndDate(futureDate);

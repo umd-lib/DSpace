@@ -119,7 +119,7 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
     protected String getEmbargoRestriction(DSpaceObject object) {
         ResourcePolicy etdEmbargoPolicy = getEtdEmbargo(object);
 
-        if ((etdEmbargoPolicy != null) && (resourcePolicyService.isDateValid(etdEmbargoPolicy))) {
+        if ((etdEmbargoPolicy != null) && resourcePolicyService.isDateValid(etdEmbargoPolicy)) {
             LocalDate liftDate = etdEmbargoPolicy.getEndDate();
             if (liftDate != null) {
                 return liftDate.format(DateTimeFormatter.ISO_LOCAL_DATE); // yyyy-MM-dd
