@@ -234,12 +234,9 @@ handle.dir = ${dspace.dir}/handle-server
 # You may also copy default settings from the corresponding authentication-*.cfg
 # configuration file and override them in this local.cfg.
 
-# UMD Customization
 # IP-based authentication/authorization. See authentication-ip.cfg for default configuration.
+# UMD Customization
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication
-
-# UMD-custom CAS authentication/authorization
-plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.CASAuthentication
 # End UMD Customization
 
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
@@ -262,6 +259,11 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authen
 # Enabled by default in authentication.cfg
 # UMD Customization
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+# End UMD Customization
+
+# UMD Customization
+# UMD-custom CAS authentication/authorization
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.CASAuthentication
 # End UMD Customization
 
 # UMD Customization
