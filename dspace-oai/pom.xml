@@ -98,6 +98,13 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
         </dependency>
+        <!-- Test dependencies from dspace-api (for AbstractUnitTest, etc.) -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Web API -->
         <dependency>

@@ -104,16 +104,20 @@ public class ItemUtils {
 
         bs = item.getBundles();
         for (Bundle b : bs) {
-            // UMD Customization
-            // Bundles other than ORIGINAL are internal (METADATA, LICENSE, ...) and must not
-            // be advertised to harvesters unless they are genuinely readable by Anonymous.
-            // Without this, the raw ProQuest ETD metadata held in the METADATA bundle -- which
-            // carries student PII -- was published to any anonymous harvester, filename and
-            // download URL included, regardless of resource policy.
+            // UMD Customization (LIBDRUM-1042)
+            // ORIGINAL bundle is always included: embargoed content appears with resource-policy
+            // metadata for aggregators like OpenAIRE.
             //
-            // ORIGINAL is deliberately left unfiltered: embargoed content must continue to
-            // appear with its resource-policy metadata (see addResourcePolicyInformation),
-            // which OpenAIRE and other aggregators rely on for embargo dates.
+            // Non-ORIGINAL bundles (METADATA, LICENSE, etc.) are included if they are readable
+            // by Anonymous. Since items are readable anonymously (embargo is at bitstream level),
+            // these bundles are typically included.
+            //
+            // However, bitstreams within non-ORIGINAL bundles are filtered: if Anonymous cannot
+            // read a specific bitstream (e.g., it's restricted), we skip it to avoid exposing
+            // filenames and metadata about restricted content.
+            //
+            // The resource policy information (including embargo dates) is still included via
+            // addResourcePolicyInformation for all bitstreams that pass this check.
             //
             // Safe to evaluate here because the OAI indexer builds these documents under an
             // unauthenticated Context (XOAI.main -> new Context(Context.Mode.READ_ONLY)), so
@@ -138,10 +142,10 @@ public class ItemUtils {
                     break;
                 }
 
-                // UMD Customization
-                // Same rule at bitstream granularity: a readable internal bundle may still
-                // hold individually restricted bitstreams. ORIGINAL stays unfiltered so that
-                // embargoed bitstreams keep their resource-policy metadata.
+                // UMD Customization (LIBDRUM-1042)
+                // Filter bitstreams in non-ORIGINAL bundles that Anonymous cannot read.
+                // ORIGINAL bundle bitstreams are always included so embargo policy metadata
+                // (with dates) is available via addResourcePolicyInformation.
                 if (!Constants.DEFAULT_BUNDLE_NAME.equals(b.getName())
                         && !authorizeService.authorizeActionBoolean(context, bit, Constants.READ)) {
                     continue;
