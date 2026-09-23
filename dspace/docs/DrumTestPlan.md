@@ -425,6 +425,8 @@ instead.
 
 ### 14) JSON-LD
 
+**Note:** This step cannot be tested in the local development environment.
+
 14.1) In a web browser, go to
 
 <https://validator.schema.org/>
