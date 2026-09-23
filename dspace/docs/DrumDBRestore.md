@@ -24,7 +24,7 @@ snapshot from Kubernetes for use with DRUM for local development.
    Start the "dspacedb" container and wait for the restore to complete.
 
     ```bash
-    $ docker compose -p d8 up -d dspacedb
+    $ docker compose -p d9 up -d dspacedb
     ```
 
     To determine if the restore is complete, run the following command, and wait
