@@ -12,7 +12,6 @@ import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,8 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.transform.Transformer;
@@ -85,6 +82,14 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.sort.OrderFormat;
 import org.dspace.util.UUIDUtils;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.Workflow;
 import org.xml.sax.InputSource;
 // SQL
 // IO
@@ -128,7 +133,26 @@ public class EtdLoader {
      * Configuration property for setting the maximum file size that can
      * be processed.
      */
-    public static final String MAX_FILE_SIZE_CONFIG_PROP = "drum.etdloader.maxFileSize";
+    public static final String MAX_FILE_SIZE_CONFIG_PROP = EtdPackage.MAX_FILE_SIZE_CONFIG_PROP;
+
+    /**
+     * Configuration property enabling the manual review workflow for ETD
+     * packages containing more than the ProQuest metadata file and a single
+     * thesis PDF.
+     */
+    public static final String REVIEW_ENABLED_CONFIG_PROP = "drum.etdloader.review.enabled";
+
+    /**
+     * Configuration property giving the name of the group that supplementary
+     * files are restricted to while an item is in manual review.
+     */
+    public static final String REVIEW_GROUP_CONFIG_PROP = "drum.etdloader.review.group";
+
+    /**
+     * Default group for restricted supplementary files, used when
+     * REVIEW_GROUP_CONFIG_PROP is not set.
+     */
+    public static final String ADMIN_GROUP_NAME = "Administrator";
 
     // Suppress default constructor
     private EtdLoader() {
@@ -139,6 +163,8 @@ public class EtdLoader {
     static long lWritten = 0;
 
     static long lEmbargo = 0;
+
+    static long lReview = 0;
 
     static SAXReader reader = new SAXReader();
 
@@ -160,9 +186,6 @@ public class EtdLoader {
 
     static DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.US);
-
-    static Pattern pZipEntry = Pattern
-            .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
 
     private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
             .getConfigurationService();
@@ -201,12 +224,36 @@ public class EtdLoader {
 
     private final static SearchService searchService = SearchUtils.getSearchService();
 
+    private final static WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+
+    private final static XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance()
+            .getWorkflowFactory();
+
     /***************************************************************** main */
     /**
      * Command line interface.
      */
 
     public static void main(String args[]) throws Exception {
+        boolean hasError = run();
+
+        // Exit with a status code of 1 if an error has occurred, to signal to
+        // the "load-etd" script that the item was not successfully processed.
+        if (hasError) {
+            log.error("Exiting with return code of 1");
+            System.exit(1);
+        }
+    }
+
+    /****************************************************************** run */
+    /**
+     * Loads the ETD Zip file given by the "etdloader.zipfile" system property.
+     *
+     * @return true if an error occurred, or an item was skipped and should be
+     * retried, false otherwise.
+     */
+
+    protected static boolean run() throws Exception {
         boolean hasError = false;
         try {
 
@@ -274,17 +321,22 @@ public class EtdLoader {
             ZipFile zip = new ZipFile(new File(strZipFile), ZipFile.OPEN_READ);
 
             // Get the list of entries
-            Map map = readItems(zip);
+            Map<String, EtdPackage> map = readItems(zip);
             log.info("Found " + map.size() + " item(s)");
 
             // Process each entry
-            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
-                String strItem = (String) i.next();
+            for (Iterator<String> i = map.keySet().iterator(); i.hasNext();) {
+                String strItem = i.next();
 
                 lRead++;
 
                 if (strSingleItem == null || strSingleItem.equals(strItem)) {
-                    loadItem(zip, strItem, (List) map.get(strItem));
+                    if (!loadItem(zip, strItem, map.get(strItem))) {
+                        // The item was skipped, so the Zip file should be
+                        // retried on the next run instead of being moved to
+                        // the "processed" directory.
+                        hasError = true;
+                    }
                 }
             }
 
@@ -298,15 +350,11 @@ public class EtdLoader {
         } finally {
             log.info("=====================================\n"
                     + "Records read:    " + lRead + "\n" + "Records written: "
-                    + lWritten + "\n" + "Embargoes:       " + lEmbargo);
+                    + lWritten + "\n" + "Embargoes:       " + lEmbargo + "\n"
+                    + "Routed to review: " + lReview);
         }
 
-        // Exit with a status code of 1 if an error has occurred, to signal to
-        // the "load-etd" script that the item was not successfully processed.
-        if (hasError) {
-            log.error("Exiting with return code of 1");
-            System.exit(1);
-        }
+        return hasError;
     }
 
     /******************************************************** addBitstreams */
@@ -314,8 +362,10 @@ public class EtdLoader {
      * Add bitstreams to the item.
      */
 
-    public static void addBitstreams(Context context, Item item, ZipFile zip,
-            List files) throws Exception {
+    public static List<Bitstream> addBitstreams(Context context, Item item, ZipFile zip,
+            EtdPackage etdPackage) throws Exception {
+        List files = etdPackage.getFileList();
+        int supplementaryCount = etdPackage.getSupplementaryFileNames().size();
 
         // Get the ORIGINAL bundle which contains public bitstreams
         Bundle originalBundle = getBundle(context, item, "ORIGINAL");
@@ -327,14 +377,26 @@ public class EtdLoader {
         ZipEntry ze = (ZipEntry) files.get(1);
         createBitstream(context, metaBundle, strFileName, zip.getInputStream(ze));
 
+        // The supplementary files are the last entries of the list, and are
+        // returned so that they can be restricted when the item is routed to
+        // manual review.
+        List<Bitstream> supplementaryBitstreams = new ArrayList<>();
+        int firstSupplementaryIndex = files.size() - (supplementaryCount * 2);
+
         // Add the content bitstreams to ORIGINAL bundle
         // Loop through the files
         for (int i = 2; i < files.size(); i += 2) {
             strFileName = (String) files.get(i);
             ze = (ZipEntry) files.get(i + 1);
 
-            createBitstream(context, originalBundle, strFileName, zip.getInputStream(ze));
+            Bitstream bitstream = createBitstream(context, originalBundle, strFileName, zip.getInputStream(ze));
+
+            if (i >= firstSupplementaryIndex) {
+                supplementaryBitstreams.add(bitstream);
+            }
         }
+
+        return supplementaryBitstreams;
     }
 
     public static Bundle getBundle(Context context, Item item, String type) throws Exception {
@@ -349,7 +411,7 @@ public class EtdLoader {
         return bundle;
     }
 
-    public static void createBitstream(Context context, Bundle bundle, String name, InputStream stream)
+    public static Bitstream createBitstream(Context context, Bundle bundle, String name, InputStream stream)
             throws Exception {
         log.debug("Adding bitstream for " + name);
 
@@ -363,6 +425,7 @@ public class EtdLoader {
 
         bitstreamService.update(context, bs);
 
+        return bs;
     }
 
     /***************************************************************** addDC */
@@ -415,13 +478,22 @@ public class EtdLoader {
     /************************************************************ addEmbargo */
     /**
      * Add embargo to the bitstreams.
+     *
+     * @param context the current DSpace context
+     * @param item the Item whose bitstreams are embargoed
+     * @param strEmbargo the date the embargo is removed, in "MM/dd/yyyy"
+     * format, or "never"
+     * @param policyType the resource policy type to give the embargo policies,
+     * or null for an untyped policy. Items routed to the review workflow need
+     * ResourcePolicy.TYPE_CUSTOM, so that the policies are not replaced by the
+     * collection's default policies when the item is installed on approval.
      */
 
     static Group etdgroup = null;
 
     static Group anongroup = null;
 
-    public static void addEmbargo(Context context, Item item, String strEmbargo)
+    public static void addEmbargo(Context context, Item item, String strEmbargo, String policyType)
             throws Exception {
 
         log.debug("Adding embargo policies");
@@ -449,6 +521,7 @@ public class EtdLoader {
             log.info("Embargoed forever");
             rp = resourcePolicyService.create(context, null, etdgroup);
             rp.setAction(Constants.READ);
+            rp.setRpType(policyType);
             lPolicies.add(rp);
         } else {
             LocalDate date = LocalDate.parse(strEmbargo, format);
@@ -458,11 +531,13 @@ public class EtdLoader {
             rp = resourcePolicyService.create(context, null, etdgroup);
             rp.setAction(Constants.READ);
             rp.setEndDate(date);
+            rp.setRpType(policyType);
             lPolicies.add(rp);
 
             rp = resourcePolicyService.create(context, null, anongroup);
             rp.setAction(Constants.READ);
             rp.setStartDate(date);
+            rp.setRpType(policyType);
             lPolicies.add(rp);
         }
 
@@ -707,9 +782,23 @@ public class EtdLoader {
     /************************************************************* loadItem */
     /**
      * Load one item into DSpace.
+     *
+     * Items whose package contains anything other than the ProQuest metadata
+     * file and a single thesis PDF are routed to the manual review workflow of
+     * the ETD collection instead of being installed directly. Their
+     * supplementary files are restricted to the review group until a reviewer
+     * decides otherwise.
+     *
+     * @param zip the ETD Zip file being loaded
+     * @param strItem the ProQuest item number
+     * @param etdPackage the classified contents of the Zip file
+     * @return true if the item was processed, false if it was skipped and
+     * should be retried on a subsequent run.
      */
 
-    public static void loadItem(ZipFile zip, String strItem, List files) {
+    public static boolean loadItem(ZipFile zip, String strItem, EtdPackage etdPackage) {
+        List files = etdPackage.getFileList();
+
         log.info("=====================================\n" + "Loading item "
                 + strItem + ": " + ((files.size() / 2) - 1) + " bitstream(s)");
 
@@ -729,6 +818,22 @@ public class EtdLoader {
                 log.debug("ETD metadata:\n" + toString(meta));
             }
 
+            // Get the embargo
+            String strEmbargo = getEmbargo(meta);
+
+            boolean needsReview = isReviewEnabled() && etdPackage.needsReview();
+
+            if (needsReview && !hasWorkflowReviewers(context, etdcollection)) {
+                // Without reviewers the workflow would archive the item
+                // immediately, publishing exactly the files that need review.
+                log.error("Skipping item " + strItem + ": it requires review ("
+                        + String.join("; ", etdPackage.getReviewReasons())
+                        + "), but the '" + etdcollection.getName()
+                        + "' collection has no workflow reviewers. The Zip file will be retried.");
+                context.abort();
+                return false;
+            }
+
             // Map to additional collections
             Set<Collection> sCollections = getCollections(context, meta);
 
@@ -744,15 +849,65 @@ public class EtdLoader {
             wi.addMappedCollections(new ArrayList<Collection>(sCollections));
 
             // Add bitstreams
-            addBitstreams(context, item, zip, files);
+            List<Bitstream> supplementaryBitstreams = addBitstreams(context, item, zip, etdPackage);
+
+            if (needsReview) {
+                // Restrict the supplementary files, apply any embargo, and
+                // hand the item to the review workflow. Both sets of policies
+                // are TYPE_CUSTOM so that they are not replaced by the
+                // collection's default policies when the item is installed on
+                // approval.
+                // The embargo is applied first, as it replaces the policies of
+                // every bitstream in the ORIGINAL bundle; a file that is both
+                // embargoed and awaiting review keeps the stricter review
+                // group policy.
+                if (strEmbargo != null) {
+                    addEmbargo(context, item, strEmbargo, ResourcePolicy.TYPE_CUSTOM);
+                    lEmbargo++;
+                }
+
+                restrictToReviewGroup(context, supplementaryBitstreams);
+
+                addReviewProvenance(context, item, etdPackage.getReviewReasons());
+
+                // The embargo and restriction policies must be in place before
+                // the workflow starts, as installItem() is not called here.
+                workflowService.start(context, wi);
+
+                // Reporting happens before the commit, as the item is
+                // detached from the Hibernate session once the context is
+                // committed.
+                reportReviewItem(context, item, etdPackage.getReviewReasons(), sCollections);
+
+                // A failed notification (e.g. the mail server is unavailable)
+                // must not roll back the routed item, as the Zip file would
+                // still be moved to the "processed" directory.
+                try {
+                    // Check for duplicate titles
+                    checkTitle(context, item, sCollections);
+
+                    // Report missing collections
+                    if (sCollections.size() == 0) {
+                        reportCollections(context, item);
+                    }
+                } catch (Exception e) {
+                    log.error("Unable to send notifications for item " + strItem
+                            + " routed to review: " + e.getMessage(), e);
+                }
+
+                context.commit();
+
+                lReview++;
+
+                return true;
+            }
 
             // Finish installation into the database
             installItemService.installItem(context, wi);
 
             // Add embargo
-            String strEmbargo = getEmbargo(meta);
             if (strEmbargo != null) {
-                addEmbargo(context, item, strEmbargo);
+                addEmbargo(context, item, strEmbargo, null);
                 lEmbargo++;
             }
 
@@ -789,6 +944,98 @@ public class EtdLoader {
                 }
             }
         }
+
+        return true;
+    }
+
+    /**
+     * Returns true if the manual review workflow is enabled.
+     *
+     * @return true if the manual review workflow is enabled, false otherwise.
+     */
+    protected static boolean isReviewEnabled() {
+        return configurationService.getBooleanProperty(REVIEW_ENABLED_CONFIG_PROP, false);
+    }
+
+    /**
+     * Returns true if the workflow of the given Collection has at least one
+     * step whose role has members, meaning a submission entering the workflow
+     * will be reviewed rather than archived immediately.
+     *
+     * @param context the current DSpace context
+     * @param collection the Collection to check
+     * @return true if the Collection has workflow reviewers, false otherwise.
+     */
+    protected static boolean hasWorkflowReviewers(Context context, Collection collection) throws Exception {
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
+
+        for (Step step : workflow.getSteps()) {
+            Role role = step.getRole();
+            if (role == null) {
+                continue;
+            }
+
+            Group group = WorkflowUtils.getRoleGroup(context, collection, role);
+            if ((group != null) && !groupService.allMembers(context, group).isEmpty()) {
+                log.debug("Collection '" + collection.getName() + "' has members for the '"
+                        + role.getName() + "' workflow role");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Replaces the policies of the given bitstreams with a READ policy for the
+     * review group, so that the files are not publicly accessible while the
+     * item is reviewed.
+     *
+     * The policies are TYPE_CUSTOM, which stops the collection's default
+     * Anonymous READ policy from being added when the item is installed on
+     * approval.
+     *
+     * @param context the current DSpace context
+     * @param bitstreams the bitstreams to restrict
+     */
+    protected static void restrictToReviewGroup(Context context, List<Bitstream> bitstreams) throws Exception {
+        if (bitstreams.isEmpty()) {
+            return;
+        }
+
+        String strGroup = configurationService.getProperty(REVIEW_GROUP_CONFIG_PROP, ADMIN_GROUP_NAME);
+
+        Group reviewGroup = groupService.findByName(context, strGroup);
+        if (reviewGroup == null) {
+            throw new Exception("Unable to find the '" + strGroup + "' group given by "
+                    + REVIEW_GROUP_CONFIG_PROP);
+        }
+
+        for (Bitstream bitstream : bitstreams) {
+            log.info("Restricting '" + bitstream.getName() + "' to the '" + strGroup + "' group");
+            authorizeService.removeAllPolicies(context, bitstream);
+            authorizeService.addPolicy(context, bitstream, Constants.READ, reviewGroup,
+                    ResourcePolicy.TYPE_CUSTOM);
+        }
+    }
+
+    /**
+     * Records why the item was routed to manual review in its provenance
+     * metadata, so the reasons are visible to the reviewer. The
+     * "dc.description.provenance" field is hidden from non-administrators.
+     *
+     * @param context the current DSpace context
+     * @param item the Item being routed to review
+     * @param reasons the reasons the item is being routed to review
+     */
+    protected static void addReviewProvenance(Context context, Item item, List<String> reasons) throws Exception {
+        String provenance = "Routed to ETD review on "
+                + LocalDate.now().format(outputFormatter) + ": "
+                + String.join("; ", reasons);
+
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance",
+                configurationService.getProperty("default.language"), provenance);
+        itemService.update(context, item);
     }
 
     /********************************************************** readItems */
@@ -799,102 +1046,19 @@ public class EtdLoader {
      * pdf. Note that each zip file now contains only one ETD item.
      */
 
-    public static Map readItems(ZipFile zip) {
+    public static Map<String, EtdPackage> readItems(ZipFile zip) {
 
-        String strItem = null;
+        EtdPackage etdPackage = EtdPackage.read(zip, maxFileSizeInBytes);
 
-        ArrayList lmap = new ArrayList();
-        lmap.add(0, new Object());
-        lmap.add(1, new Object());
-        lmap.add(2, new Object());
-        lmap.add(3, new Object());
-
-        log.info("Reading " + zip.size() + " zip file entries");
-
-        // Loop through the entries
-        for (Enumeration e = zip.entries(); e.hasMoreElements();) {
-            ZipEntry ze = (ZipEntry) e.nextElement();
-            String strName = ze.getName();
-
-            log.debug("zip entry: " + strName);
-
-            // skip directories
-            if (ze.isDirectory()) {
-                continue;
-            }
-
-            // split into path components
-            String s[] = strName.split("/");
-
-            String strFileName = s[s.length - 1];
-
-            Matcher m = pZipEntry.matcher(s[0]);
-            if (m.matches()) {
-                if (!isFileSizeWithinLimit(ze, maxFileSizeInBytes)) {
-                    long uncompressedSize = ze.getSize();
-                    String msg = """
-                        ===============================================
-                        ERROR: Zip file entry too large
-
-                        The file '%s' in '%s'
-                        is too large at %d bytes, exceeding the limit
-                        of %d bytes set in the '%s'
-                        configuration property.
-                        Skipping.
-                        ===============================================
-                        """.formatted(
-                            strFileName, zip.getName(), uncompressedSize,
-                            maxFileSizeInBytes, MAX_FILE_SIZE_CONFIG_PROP
-                        );
-                    throw new ZipEntryTooLarge(msg);
-                }
-
-                // Get the item number
-                if (strItem == null) {
-                    strItem = m.group(1);
-
-                    log.debug("item number is " + strItem);
-                }
-
-                // Put the file in the right position
-                if (strFileName.endsWith("_DATA.xml")) {
-                    lmap.set(0, strFileName);
-                    lmap.set(1, ze);
-                } else if (strFileName.endsWith(".pdf")) {
-                    lmap.set(2, strFileName);
-                    lmap.set(3, ze);
-                }
-            } else {
-                lmap.add(strFileName);
-                lmap.add(ze);
-            }
+        if (etdPackage.getItemNumber() == null) {
+            throw new IllegalStateException(
+                "No ProQuest files found in '%s'".formatted(zip.getName()));
         }
 
-        Map map = new TreeMap();
-        map.put(strItem, lmap);
+        Map<String, EtdPackage> map = new TreeMap<>();
+        map.put(etdPackage.getItemNumber(), etdPackage);
 
         return map;
-    }
-
-    /**
-     * Returns true if the ZipEntry is less than or equal to the given
-     * maximum file size limit, false otherwise.
-     *
-     * The maximum file size is typically controlled by the
-     * MAX_FILE_SIZE_CONFIG_PROP configuration parameter.
-     *
-     * @param ze the ZipEntry to examine
-     * @param maxFileSizeInBytes the maximum allows file size in bytes. Use
-     * -1 to indicate unlimited file size.
-     * @return
-     */
-    protected static boolean isFileSizeWithinLimit(ZipEntry ze, long maxFileSizeInBytes) {
-        // Negative number indicates unlimited file size
-        if (maxFileSizeInBytes < 0) {
-            return true;
-        }
-
-        return ze.getSize() <= maxFileSizeInBytes;
     }
 
     /**************************************************** reportCollections */
@@ -942,6 +1106,39 @@ public class EtdLoader {
         String title = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "title", null,
                 Item.ANY);
         sb.append("  Title: " + title + "\n");
+
+        // Collections
+        sb.append("  Collection: " + etdcollection.getName() + "\n");
+        for (Iterator ic = sCollections.iterator(); ic.hasNext();) {
+            Collection coll = (Collection) ic.next();
+            sb.append("  Collection: " + coll.getName() + "\n");
+        }
+
+        log.info(sb.toString());
+    }
+
+    /***************************************************** reportReviewItem */
+    /**
+     * Report an item that was routed to the manual review workflow.
+     *
+     * @param c the current DSpace context
+     * @param item the Item routed to review
+     * @param reasons the reasons the item was routed to review
+     * @param sCollections the additional collections the item is mapped to
+     */
+    private static void reportReviewItem(Context c, Item item, List<String> reasons,
+            Set sCollections) throws Exception {
+
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("Item routed to review: " + item.getID() + "\n");
+
+        // Title
+        String title = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "title", null,
+                Item.ANY);
+        sb.append("  Title: " + title + "\n");
+
+        sb.append("  Reason: " + String.join("; ", reasons) + "\n");
 
         // Collections
         sb.append("  Collection: " + etdcollection.getName() + "\n");

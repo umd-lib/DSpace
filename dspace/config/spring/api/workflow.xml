@@ -215,6 +215,7 @@
             <list>
                 <ref bean="equitableaccesscollectionmappingaction"/>
                 <ref bean="datacommunitycollectionmappingaction"/>
+                <ref bean="etddepartmentcollectionmappingaction"/>
             </list>
         </property>
     </bean>

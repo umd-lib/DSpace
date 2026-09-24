@@ -409,6 +409,15 @@ drum.etdloader.collection = ba3ddc3f-7a58-4fd3-bde5-304938050ea2
 # Comment out, or use -1 for unlimited
 drum.etdloader.maxFileSize=15032385536
 
+# Route ETD packages containing more than the ProQuest "_DATA.xml" metadata
+# file and a single thesis PDF to the review workflow of the
+# "drum.etdloader.collection" collection, instead of installing them directly.
+# The collection must have workflow reviewers, otherwise the affected items are
+# skipped and their Zip files retried on the next run.
+drum.etdloader.review.enabled = false
+# Group that supplementary files are restricted to while an item is in review
+drum.etdloader.review.group = Administrator
+
 # Environment Banner configuration
 # Leave blank on production environment
 # Valid options: local, dev, stage
