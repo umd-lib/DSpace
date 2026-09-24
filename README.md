@@ -86,11 +86,6 @@ Confluence for information about setting up a MacBook to use the Kubernetes
 
 8) Create the "docker.lib.umd.edu/drum-solr":
 
-    **Note:** The "Dockerfile" for the "drum-solr" image specifies only the
-    major Solr version as the base image. This allows Solr minor version updates
-    to be retrieved automatically. It may not be necessary to create new
-    "drum-solr" image versions for every DRUM patch or hotfix version increment.
-
     ```bash
     $ cd $DRUM_DIR/dspace/solr
 
@@ -102,7 +97,7 @@ Confluence for information about setting up a MacBook to use the Kubernetes
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
   base DSpace functionality
 * [DrumTestPlan](dspace/docs/DrumTestPlan.md) - Covers some manual tests for
-customized features and deployment configurations.
+  customized features and deployment configurations.
 * [DrumConfigurationCustomization](dspace/docs/DrumConfigurationCustomization.md) -
   Information about customizing DSpace for DRUM.
 * [docs](dspace/docs) - additional documentation
@@ -130,8 +125,8 @@ The following customizations *do not* need to be commented:
   tabs in the modified DSpace file being automatically converted to spaces by
   VS Code, or an end-of-file line.
 
-The main goal is to make it immediately when performing DSpace version upgrades
-whether a change in a file is due to an explicit UMD customization.
+The main goal is to make it immediately obvious when performing DSpace version
+upgrades whether a change in a file is due to an explicit UMD customization.
 
 ## License
 

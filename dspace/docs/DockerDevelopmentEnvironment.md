@@ -1,7 +1,7 @@
 # Docker Development Environment
 
 This document contains instructions for building a local development instance
-of a DRUM using Docker.
+of DRUM using Docker.
 
 ## Development Prerequisites
 
