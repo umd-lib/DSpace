@@ -104,6 +104,30 @@ public class ItemUtils {
 
         bs = item.getBundles();
         for (Bundle b : bs) {
+            // UMD Customization (LIBDRUM-1042)
+            // ORIGINAL bundle is always included: embargoed content appears with resource-policy
+            // metadata for aggregators like OpenAIRE.
+            //
+            // Non-ORIGINAL bundles (METADATA, LICENSE, etc.) are included if they are readable
+            // by Anonymous. Since items are readable anonymously (embargo is at bitstream level),
+            // these bundles are typically included.
+            //
+            // However, bitstreams within non-ORIGINAL bundles are filtered: if Anonymous cannot
+            // read a specific bitstream (e.g., it's restricted), we skip it to avoid exposing
+            // filenames and metadata about restricted content.
+            //
+            // The resource policy information (including embargo dates) is still included via
+            // addResourcePolicyInformation for all bitstreams that pass this check.
+            //
+            // Safe to evaluate here because the OAI indexer builds these documents under an
+            // unauthenticated Context (XOAI.main -> new Context(Context.Mode.READ_ONLY)), so
+            // authorizeActionBoolean resolves against the Anonymous group.
+            if (!Constants.DEFAULT_BUNDLE_NAME.equals(b.getName())
+                    && !authorizeService.authorizeActionBoolean(context, b, Constants.READ)) {
+                continue;
+            }
+            // End UMD Customization
+
             Element bundle = create("bundle");
             bundles.getElement().add(bundle);
             bundle.getField().add(createValue("name", b.getName()));
@@ -117,6 +141,17 @@ public class ItemUtils {
                     log.error("Null bitstream found, check item uuid: " + item.getID());
                     break;
                 }
+
+                // UMD Customization (LIBDRUM-1042)
+                // Filter bitstreams in non-ORIGINAL bundles that Anonymous cannot read.
+                // ORIGINAL bundle bitstreams are always included so embargo policy metadata
+                // (with dates) is available via addResourcePolicyInformation.
+                if (!Constants.DEFAULT_BUNDLE_NAME.equals(b.getName())
+                        && !authorizeService.authorizeActionBoolean(context, bit, Constants.READ)) {
+                    continue;
+                }
+                // End UMD Customization
+
                 boolean primary = false;
                 // Check if current bitstream is in original bundle + 1 of the 2 following
                 // Bitstream = primary bitstream in bundle -> true
