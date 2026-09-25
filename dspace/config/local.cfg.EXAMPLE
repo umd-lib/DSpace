@@ -409,12 +409,6 @@ drum.etdloader.collection = ba3ddc3f-7a58-4fd3-bde5-304938050ea2
 # Comment out, or use -1 for unlimited
 drum.etdloader.maxFileSize=15032385536
 
-# Environment Banner configuration
-# Leave blank on production environment
-# Valid options: local, dev, stage
-drum.environment.name = local
-drum.environment.bannerText = Local Environment
-
 # Data Community
 data.community.handle = 1903/27669
 
