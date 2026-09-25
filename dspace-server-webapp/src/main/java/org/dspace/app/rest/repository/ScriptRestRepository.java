@@ -57,6 +57,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     // authorization is verified inside the method
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -123,9 +126,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private List<DSpaceCommandLineParameter> processPropertiesToDSpaceCommandLineParameters(String propertiesJson)
         throws IOException {
         List<ParameterValueRest> parameterValueRestList = new LinkedList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
         if (StringUtils.isNotBlank(propertiesJson)) {
-            parameterValueRestList = Arrays.asList(objectMapper.readValue(propertiesJson, ParameterValueRest[].class));
+            parameterValueRestList = Arrays.asList(mapper.readValue(propertiesJson, ParameterValueRest[].class));
         }
 
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();
@@ -191,6 +193,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             String fileName = file.getOriginalFilename();
             if (fileNames.contains(fileName)) {
                 throw new UnprocessableEntityException("There are two files with the same name: " + fileName);
+            } else if (StringUtils.containsAny(fileName, "..", "/", "\\")) {
+                // NOTE: This is just a "fail-fast", basic protection against a potential path traversal attack.
+                // Individual scripts MUST also contain their own path traversal protections.
+                throw new UnprocessableEntityException(
+                    "Filenames cannot contain path characters such as '..', '/', or '\\' : " + fileName);
             } else {
                 fileNames.add(fileName);
             }

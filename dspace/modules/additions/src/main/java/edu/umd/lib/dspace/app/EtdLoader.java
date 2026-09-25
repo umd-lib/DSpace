@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +41,7 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.dspace.app.util.XMLUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -157,7 +158,8 @@ public class EtdLoader {
     // is unlimited.
     static long maxFileSizeInBytes = -1L;
 
-    static SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+    static DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    static DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd yyyy", Locale.US);
 
     static Pattern pZipEntry = Pattern
             .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
@@ -229,7 +231,7 @@ public class EtdLoader {
             log.info("ETD Loader Collection: " + strCollection);
 
             // the transformers
-            TransformerFactory tFactory = TransformerFactory.newInstance();
+            TransformerFactory tFactory = XMLUtils.getTransformerFactory();
             tDC = tFactory.newTransformer(new StreamSource(new File(strDspace
                     + "/config/load/etd2dc.xsl")));
 
@@ -449,8 +451,9 @@ public class EtdLoader {
             rp.setAction(Constants.READ);
             lPolicies.add(rp);
         } else {
-            Date date = format.parse(strEmbargo);
-            log.info("Embargoed until " + date);
+            LocalDate date = LocalDate.parse(strEmbargo, format);
+
+            log.info("Embargoed until " + date.format(outputFormatter));
 
             rp = resourcePolicyService.create(context, null, etdgroup);
             rp.setAction(Constants.READ);

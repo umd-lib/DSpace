@@ -17,7 +17,7 @@ import java.io.PrintStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,7 +78,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
 
         // load curation tasks
         if (curationClientOptions == CurationClientOptions.TASK) {
-            long start = System.currentTimeMillis();
+            long start = Instant.now().toEpochMilli();
             handleCurationTask(curator);
             this.endScript(start);
         }
@@ -121,9 +121,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
             try {
                 String dspaceDir = DSpaceServicesFactory.getInstance()
                     .getConfigurationService().getProperty("dspace.dir");
-                List<String> allowedTaskFileBasePath = new ArrayList<>(
-                        Arrays.asList(DSpaceServicesFactory.getInstance().getConfigurationService()
-                        .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})));
+                List<String> allowedTaskFileBasePath = Arrays.stream(
+                        DSpaceServicesFactory.getInstance().getConfigurationService()
+                        .getArrayProperty("curate.taskfile.base", new String[]{dspaceDir})
+                        ).toList();
                 reader = SecureFileAccess.getBufferedReader(taskFilePath, allowedTaskFileBasePath,
                         "curation-taskfile", StandardCharsets.UTF_8);
                 while ((taskName = reader.readLine()) != null) {
@@ -161,7 +162,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      */
     private long runQueue(TaskQueue queue, Curator curator) throws SQLException, AuthorizeException, IOException {
         // use current time as our reader 'ticket'
-        long ticket = System.currentTimeMillis();
+        long ticket = Instant.now().toEpochMilli();
         Iterator<TaskQueueEntry> entryIter = queue.dequeue(this.queue, ticket).iterator();
         while (entryIter.hasNext()) {
             TaskQueueEntry entry = entryIter.next();
@@ -187,7 +188,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
     private void endScript(long timeRun) throws SQLException {
         context.complete();
         if (verbose) {
-            long elapsed = System.currentTimeMillis() - timeRun;
+            long elapsed = Instant.now().toEpochMilli() - timeRun;
             this.handler.logInfo("Ending curation. Elapsed time: " + elapsed);
         }
     }
@@ -203,9 +204,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         OutputStream reporterStream;
         String dspaceDir = DSpaceServicesFactory.getInstance()
             .getConfigurationService().getProperty("dspace.dir");
-        List<String> allowedReporterBasePaths = new ArrayList<>(Arrays.asList(DSpaceServicesFactory.getInstance()
-                .getConfigurationService().getArrayProperty("curate.reporter.base",
-                        new String[]{dspaceDir + File.separatorChar + "log"})));
+        List<String> allowedReporterBasePaths = Arrays.stream(
+            DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getArrayProperty("curate.reporter.base",
+                    new String[]{dspaceDir + File.separatorChar + "log"})).toList();
         if (null == this.reporter) {
             reporterStream = NullOutputStream.INSTANCE;
         } else if ("-".equals(this.reporter)) {

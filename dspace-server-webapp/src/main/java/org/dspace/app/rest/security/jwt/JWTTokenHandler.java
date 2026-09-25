@@ -9,7 +9,7 @@ package org.dspace.app.rest.security.jwt;
 
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import com.nimbusds.jose.CompressionAlgorithm;
@@ -165,7 +165,7 @@ public abstract class JWTTokenHandler {
      * @throws JOSEException passed through.
      * @throws SQLException passed through.
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate)
+    public String createTokenForEPerson(Context context, HttpServletRequest request, Instant previousLoginDate)
         throws JOSEException, SQLException {
 
         // Verify that the user isn't trying to use a short lived token to generate another token
@@ -283,11 +283,11 @@ public abstract class JWTTokenHandler {
             JWSVerifier verifier = new MACVerifier(buildSigningKey(ePerson));
 
             //If token is valid and not expired return eperson in token
-            Date expirationTime = jwtClaimsSet.getExpirationTime();
+            java.util.Date expirationTime = jwtClaimsSet.getExpirationTime();
             return signedJWT.verify(verifier)
                 && expirationTime != null
                 //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
-                && DateUtils.isAfter(expirationTime, new Date(), MAX_CLOCK_SKEW_SECONDS);
+                && DateUtils.isAfter(expirationTime, java.util.Date.from(Instant.now()), MAX_CLOCK_SKEW_SECONDS);
         }
     }
 
@@ -359,7 +359,8 @@ public abstract class JWTTokenHandler {
         }
 
         return builder
-            .expirationTime(new Date(System.currentTimeMillis() + getExpirationPeriod()))
+            .expirationTime(java.util.Date.from(
+                Instant.ofEpochMilli(Instant.now().toEpochMilli() + getExpirationPeriod())))
             .build();
     }
 
@@ -403,7 +404,7 @@ public abstract class JWTTokenHandler {
      * @return EPerson object of current user, with an updated session salt
      * @throws SQLException
      */
-    protected EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
+    protected EPerson updateSessionSalt(final Context context, final Instant previousLoginDate) throws SQLException {
         EPerson ePerson;
 
         try {
@@ -413,7 +414,8 @@ public abstract class JWTTokenHandler {
             //This allows a user to login on multiple devices/browsers at the same time.
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
-                || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
+                || (ePerson.getLastActive().toEpochMilli() - previousLoginDate.toEpochMilli() > getExpirationPeriod())
+            ) {
                 log.debug("Regenerating auth token as session salt was either empty or expired..");
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
@@ -429,7 +431,7 @@ public abstract class JWTTokenHandler {
     /**
      * Generate a random 32 bytes key
      */
-    private String generateRandomKey() {
+    String generateRandomKey() {
         //24 bytes because BASE64 encoding makes this 32 bytes
         //Base64 takes 4 characters for every 3 bytes
 

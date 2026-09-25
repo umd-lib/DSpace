@@ -39,10 +39,12 @@ public class LdapRest extends DSpaceObjectRest {
         return PLURAL_NAME;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

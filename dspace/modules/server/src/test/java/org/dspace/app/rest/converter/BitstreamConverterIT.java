@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -31,7 +32,7 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
     private ResourcePolicy otherPolicy;
     private Bitstream mockBitstream;
     private BitstreamConverter converter;
-    private SimpleDateFormat asDate;
+    private DateTimeFormatter asDate;
 
     @Before
     public void setup() throws Exception {
@@ -53,7 +54,7 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
         // autowiring the converters (see comment in DSpaceObjectConverter)
         converter = (BitstreamConverter) ((DSpaceObjectConverter)
              converterService.getConverter(Bitstream.class));
-        asDate = new SimpleDateFormat("yyyy-MM-dd");
+        asDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     @Test(expected = NullPointerException.class)
@@ -76,7 +77,7 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testgetEmbargoRestriction_ReturnsNone_WhenEtdEmbargoPolicyWithEndDateInPast() throws Exception {
-        etdEmbargoPolicy.setEndDate(asDate.parse("1972-12-03"));
+        etdEmbargoPolicy.setEndDate(LocalDate.parse("1972-12-03", asDate));
         when(mockBitstream.getResourcePolicies()).thenReturn(List.of(etdEmbargoPolicy));
 
         assertEquals("NONE", converter.getEmbargoRestriction(mockBitstream));
@@ -84,8 +85,7 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testgetEmbargoRestriction_ReturnsEndDate_WhenEtdEmbargoPolicyWithEndDateInFuture() throws Exception {
-        long oneYearInMillis = 365l * 24 * 60 * 60 * 1000;
-        Date futureDate = new Date(System.currentTimeMillis() + oneYearInMillis); // One year (approx.) in the future
+        LocalDate futureDate = LocalDate.now(ZoneOffset.UTC).plusYears(1);
 
         String expectedDateStr = asDate.format(futureDate);
         etdEmbargoPolicy.setEndDate(futureDate);

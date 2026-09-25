@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
@@ -133,7 +132,7 @@ public class ItemArchive {
     protected Transformer getTransformer()
         throws TransformerConfigurationException {
         if (transformer == null) {
-            transformer = TransformerFactory.newInstance().newTransformer();
+            transformer = XMLUtils.getTransformerFactory().newTransformer();
         }
         return transformer;
     }
@@ -207,7 +206,7 @@ public class ItemArchive {
         throws SQLException, Exception {
         DtoMetadata dtom = getMetadataField("dc.identifier.uri");
         if (dtom == null) {
-            throw new Exception("No dc.identier.uri field found for handle");
+            throw new Exception("No dc.identifier.uri field found for handle");
         }
 
         this.addUndoMetadataField(dtom);  //seed the undo list with the uri

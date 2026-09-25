@@ -144,7 +144,7 @@ be displayed.
 | Group | <Select "UM Community" from the dropdown> |
 
 then left-click the "Save" button. A notification will display indicating that
-the community was successfully added.  The "SSDR Test Community" page will be
+the community was successfully added. The "SSDR Test Community" page will be
 displayed.
 
 ### 5) Collection Creation
@@ -201,8 +201,9 @@ dropdown field is removed.
 In the "Accessibility" section, left-click the accessibility
 confirmation to select it.
 
-Verify that the "Creative commons license" section has a dropdown with two
-entries (but do not select either of them):
+In the "Creative commons license" section, left-click the
+"Select a license type..." button and verify that the following two options are
+shown (but do not select either of them):
 
 * CC0
 * Creative Commons
@@ -381,9 +382,6 @@ above, as well as additional files containing the metadata.
 
 ### 12) Batch Import (Zip)
 
-**Note:** This step cannot be tested in the local development environment,
-unless a local handle server is available.
-
 12.1) Download the "drum_batch_import.zip" file attached to
 <https://umd-dit.atlassian.net/browse/LIBDRUM-897> to the local workstation.
 
@@ -393,7 +391,7 @@ The “Import Batch” page will be displayed.
 12.3) Drag-and-drop the “drum-batch-import.zip” file onto the “Import Batch” page.
 Then do the following:
 
-* Left-click the “Select collection” button, and left-click the
+* Left-click the “Select Collection” button, and left-click the
   “SSDR Test Collection”
 * Uncheck the “Validate Only” checkbox
 * Left-click the “Proceed” button. A notification will be displayed indicating
@@ -424,6 +422,8 @@ information is displayed.
 instead.
 
 ### 14) JSON-LD
+
+**Note:** This step cannot be tested in the local development environment.
 
 14.1) In a web browser, go to
 

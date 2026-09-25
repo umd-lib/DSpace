@@ -63,7 +63,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
         throws DSpaceSwordException, SwordError, SwordAuthException,
         SwordServerException {
         try {
-            // if we are actuall given an item in the deposit result of a previous operation
+            // if we are actually given an item in the deposit result of a previous operation
             // then we do an ingestToItem
             if (result != null) {
                 Item item = result.getItem();
@@ -143,7 +143,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             // get reference to item so that we can report on it
             Item installedItem = (Item) ingestedObject;
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, installedItem, verboseDescription);
 
@@ -259,7 +259,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             // get reference to item so that we can report on it
             Item installedItem = (Item) ingestedObject;
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, installedItem, verboseDescription);
 

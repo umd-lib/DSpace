@@ -8,7 +8,7 @@
 package org.dspace.checker;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -65,7 +65,8 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
      * @throws SQLException if database error
      */
     @Override
-    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Instant startDate,
+                                                                     Instant endDate)
         throws SQLException {
         return mostRecentChecksumDAO.findByNotProcessedInDateRange(context, startDate, endDate);
     }
@@ -82,7 +83,8 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
      * @throws SQLException if database error
      */
     @Override
-    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Instant startDate,
+                                                                  Instant endDate,
                                                                   ChecksumResultCode resultCode) throws SQLException {
         return mostRecentChecksumDAO.findByResultTypeInDateRange(context, startDate, endDate, resultCode);
     }
@@ -130,7 +132,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
      * @throws SQLException if database error
      */
     @Override
-    public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException {
+    public MostRecentChecksum findOldestRecord(Context context, Instant lessThanDate) throws SQLException {
         return mostRecentChecksumDAO.getOldestRecord(context, lessThanDate);
     }
 

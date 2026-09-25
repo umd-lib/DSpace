@@ -98,6 +98,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public ItemRestRepository(ItemService dsoService) {
         super(dsoService);
     }
@@ -276,7 +279,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     protected ItemRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String owningCollectionUuidString = req.getParameter("owningCollection");
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = null;
         try {
             ServletInputStream input = req.getInputStream();
@@ -313,7 +315,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                            JsonNode jsonNode)
         throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = null;
         try {
             itemRest = mapper.readValue(jsonNode.toString(), ItemRest.class);

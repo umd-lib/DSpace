@@ -14,11 +14,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +83,7 @@ public class ProcessServiceImpl implements ProcessService {
         process.setEPerson(ePerson);
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
-        process.setCreationTime(new Date());
+        process.setCreationTime(Instant.now());
         Optional.ofNullable(specialGroups)
             .ifPresent(sg -> {
                 // we use a set to be sure no duplicated special groups are stored with process
@@ -142,9 +142,9 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void start(Context context, Process process) throws SQLException {
+    public void start(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.RUNNING);
-        process.setStartTime(new Date());
+        process.setStartTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_start", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has started"));
@@ -152,9 +152,9 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void fail(Context context, Process process) throws SQLException {
+    public void fail(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.FAILED);
-        process.setFinishedTime(new Date());
+        process.setFinishedTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_fail", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has failed"));
@@ -162,9 +162,9 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void complete(Context context, Process process) throws SQLException {
+    public void complete(Context context, Process process) throws SQLException, AuthorizeException {
         process.setProcessStatus(ProcessStatus.COMPLETED);
-        process.setFinishedTime(new Date());
+        process.setFinishedTime(Instant.now());
         update(context, process);
         log.info(LogHelper.getHeader(context, "process_complete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been completed"));
@@ -174,6 +174,9 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException {
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot append file to process " + process.getID());
+        }
         Bitstream bitstream = bitstreamService.create(context, is);
         if (getBitstream(context, process, type) != null) {
             throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
@@ -194,7 +197,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException {
-
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot delete process " + process.getID());
+        }
         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
             bitstreamService.delete(context, bitstream);
         }
@@ -204,7 +209,10 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void update(Context context, Process process) throws SQLException {
+    public void update(Context context, Process process) throws SQLException, AuthorizeException {
+        if (!authorizeActionBoolean(context, process)) {
+            throw new AuthorizeException("Cannot update process " + process.getID());
+        }
         processDAO.save(context, process);
     }
 
@@ -322,7 +330,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
-        Date date) throws SQLException {
+        Instant date) throws SQLException {
         return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
     }
 
@@ -331,27 +339,58 @@ public class ProcessServiceImpl implements ProcessService {
         return processDAO.countByUser(context, user);
     }
 
+    /**
+     * Authorize any action, to ensure only a process creator/owner or a repository administrator
+     * may read, update or delete an existing process.
+     * @param context DSpace context containing the current user
+     * @param process the process to check
+     * @return true if the current user may perform the action, or false
+     */
+    @Override
+    public boolean authorizeActionBoolean(Context context, Process process) {
+        try {
+            if (process == null) {
+                return false;
+            }
+            // Only the process owner or an administrator may perform any action
+            EPerson currentUser = context.getCurrentUser();
+            EPerson processOwner = process.getEPerson();
+            boolean isOwner = currentUser != null && processOwner != null
+                    && currentUser.getID().equals(processOwner.getID());
+            if (isOwner || authorizeService.isAdmin(context)) {
+                return true;
+            }
+        } catch (SQLException e) {
+            log.error(e::getMessage, e);
+        }
+        return false;
+    }
+
     @Override
     public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
-                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
+                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), Instant.now());
         for (Process process : processesToBeFailed) {
-            context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
-            fail(context, process);
-            // But still attach its log to the process.
-            appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
-            createLogBitstream(context, process);
+            context.turnOffAuthorisationSystem();
+            try {
+                // Fail the process.
+                log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.",
+                        process.getID());
+                fail(context, process);
+                // But still attach its log to the process.
+                appendLog(process.getID(), process.getName(),
+                        "Process did not complete before tomcat shutdown.",
+                        ProcessLogLevel.ERROR);
+                createLogBitstream(context, process);
+            } finally {
+                context.restoreAuthSystemState();
+            }
         }
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         StringBuilder sb = new StringBuilder();
-        sb.append(sdf.format(new Date()));
+        sb.append(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
         sb.append(" ");
         sb.append(processLogLevel);
         sb.append(" ");

@@ -13,9 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +41,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.storage.secure.SecureFileAccess;
 import org.dspace.utils.DSpace;
 
 /**
@@ -157,7 +160,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             return;
         }
 
-        Date startTime = new Date();
+        Instant startTime = Instant.now();
         Context context = new Context(Context.Mode.BATCH_EDIT);
 
         setMapFile();
@@ -255,12 +258,12 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 }
             }
 
-            Date endTime = new Date();
-            handler.logInfo("Started: " + startTime.getTime());
-            handler.logInfo("Ended: " + endTime.getTime());
+            Instant endTime = Instant.now();
+            handler.logInfo("Started: " + DateTimeFormatter.ISO_INSTANT.format(startTime));
+            handler.logInfo("Ended: " + DateTimeFormatter.ISO_INSTANT.format(endTime));
             handler.logInfo(
-                "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
-                    .getTime() - startTime.getTime()) + " msecs)");
+                "Elapsed time: " + ((endTime.toEpochMilli() - startTime.toEpochMilli()) / 1000) + " secs (" +
+                    (endTime.toEpochMilli() - startTime.toEpochMilli()) + " msecs)");
         }
     }
 
@@ -351,8 +354,16 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                     validateZip(validationFileStream.get());
                 }
 
-                workFile = new File(itemImportService.getTempWorkDir() + File.separator
-                        + zipfilename + "-" + context.getCurrentUser().getID());
+                String workDir = itemImportService.getTempWorkDir();
+
+                // zipfilename is user controlled (via -z or -u param). So, we must validate the expected
+                // file path using SecureFileAccess to protect against path traversal attacks.
+                String fileName = zipfilename + "-" + context.getCurrentUser().getID();
+                String fileAbsolutePath = SecureFileAccess.calculateAbsolutePathUsingBaseDir(fileName, workDir);
+                Path validatedFilePath = SecureFileAccess.validatePathForWrite(fileAbsolutePath, List.of(workDir),
+                                                                               "ItemImport zip validation");
+
+                workFile = validatedFilePath.toFile();
                 FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
             } else {
                 throw new IllegalArgumentException(

@@ -352,7 +352,9 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         Unit unit1 = createUnit("Test unit", Collections.EMPTY_LIST);
         Unit unit2 = createUnit("Test unit 2", Collections.EMPTY_LIST);
         Unit unit3 = createUnit("Test unit 3", Collections.EMPTY_LIST);
-        Unit unit4 = createUnit("Test other unit", Collections.EMPTY_LIST);
+        // Create an additional unit with a different prefix to verify that it
+        // is not returned on a name substring search
+        createUnit("Test other unit", Collections.EMPTY_LIST);
 
         // Search by name
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -369,7 +371,7 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // Search by name (case insensitive)
         getClient(authToken).perform(get("/api/eperson/units/search/byMetadata")
-                                             .param("query", unit1.getName().toLowerCase()))
+                                             .param("query", unit1.getName().toLowerCase(Locale.getDefault())))
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.units", Matchers.containsInAnyOrder(

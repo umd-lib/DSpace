@@ -13,7 +13,9 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.Period;
+import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
@@ -22,6 +24,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -40,10 +43,13 @@ import org.dspace.profile.OrcidSynchronizationMode;
 public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private boolean withdrawn = false;
+    private boolean inArchive = false;
     private String handle = null;
     private WorkspaceItem workspaceItem;
     private Item item;
     private Group readerGroup = null;
+    private Instant lastModified;
+    private String dateAccessioned;
 
     protected ItemBuilder(Context context) {
         super(context);
@@ -304,6 +310,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
+    public ItemBuilder inArchive() {
+        inArchive = true;
+        return this;
+    }
+
     /**
      * Set an embargo to end after some time from "now".
      *
@@ -387,6 +398,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "email", null, email);
     }
 
+    public ItemBuilder withLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+    public ItemBuilder withDateAccessioned(String dateAccessioned) {
+        this.dateAccessioned = dateAccessioned;
+        return this;
+    }
+
     @Override
     public Item build() {
         try {
@@ -401,9 +422,23 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             if (withdrawn) {
                 itemService.withdraw(context, item);
             }
+            if (inArchive) {
+                item.setArchived(inArchive);
+            }
+
+            if (lastModified != null) {
+                item.setLastModified(lastModified);
+            }
+
+            if (dateAccessioned != null) {
+                List<MetadataValue> dateAccessionedValues = itemService.getMetadata(item, "dc",
+                    "date", "accessioned", Item.ANY);
+                itemService.removeMetadataValues(context, item, dateAccessionedValues);
+                itemService.addMetadata(context, item, "dc", "date", "accessioned", null,
+                    new DCDate(dateAccessioned).toString());
+            }
 
             context.dispatchEvents();
-
             indexingService.commit();
             return item;
         } catch (Exception e) {

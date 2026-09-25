@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -77,8 +77,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         configurationService.setProperty("plugin.named.org.dspace.content.authority.ChoiceAuthority",
                 new String[] {
                         "org.dspace.content.authority.SolrAuthority = SolrAuthorAuthority",
-                        "org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher",
-                        "org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle"
+                        "org.dspace.content.authority.OpenPolicyFinderPublisherAuthority = SRPublisher",
+                        "org.dspace.content.authority.OpenPolicyFinderJournalTitle = SRJournalTitle"
                 });
 
         configurationService.setProperty("solr.authority.server",
@@ -127,8 +127,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         person1.setFirstName("Seiko");
         person1.setValue("Shirasaka, Seiko");
         person1.setField("dc_contributor_author");
-        person1.setLastModified(new Date());
-        person1.setCreationDate(new Date());
+        person1.setLastModified(Instant.now());
+        person1.setCreationDate(Instant.now());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person1);
 
         PersonAuthorityValue person2 = new PersonAuthorityValue();
@@ -137,8 +137,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         person2.setFirstName("Tyler E");
         person2.setValue("Miller, Tyler E");
         person2.setField("dc_contributor_author");
-        person2.setLastModified(new Date());
-        person2.setCreationDate(new Date());
+        person2.setLastModified(Instant.now());
+        person2.setCreationDate(Instant.now());
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person2);
 
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().commit();
@@ -368,7 +368,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void sherpaJournalTest() throws Exception {
+    public void opfJournalTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SRJournalTitle/entries")
@@ -384,7 +384,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void sherpaPublisherTest() throws Exception {
+    public void opfPublisherTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SRPublisher/entries")

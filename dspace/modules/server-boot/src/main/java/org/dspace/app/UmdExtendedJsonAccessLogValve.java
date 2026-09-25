@@ -123,8 +123,7 @@ public class UmdExtendedJsonAccessLogValve extends JsonAccessLogValve {
         int lastElementIndex = logElements.size() - 1;
         AccessLogElement lastElement = logElements.get(lastElementIndex);
 
-        if (lastElement instanceof StringElement) {
-            StringElement e = (StringElement) lastElement;
+        if (lastElement instanceof StringElement e) {
             CharArrayWriter caw = new CharArrayWriter();
             e.addElement(caw, null, null, null, 0l);
             return "}}".equals(caw.toString());

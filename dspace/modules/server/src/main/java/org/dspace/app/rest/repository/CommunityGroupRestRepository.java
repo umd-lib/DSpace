@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CommunityGroupRest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.CommunityGroup;
@@ -29,9 +28,6 @@ import org.springframework.stereotype.Component;
 @Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.PLURAL_NAME)
 public class CommunityGroupRestRepository extends DSpaceRestRepository<CommunityGroupRest, Integer> {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(CommunityGroupRestRepository.class);
-
     @Autowired
     AuthorizeService authorizeService;
 
@@ -44,8 +40,7 @@ public class CommunityGroupRestRepository extends DSpaceRestRepository<Community
     @Override
     @PreAuthorize("permitAll()")
     public CommunityGroupRest findOne(Context context, Integer id) {
-        CommunityGroup communityGroup = null;
-        communityGroup = cgs.find(id);
+        CommunityGroup communityGroup = cgs.find(id);
         if (communityGroup == null) {
             return null;
         }

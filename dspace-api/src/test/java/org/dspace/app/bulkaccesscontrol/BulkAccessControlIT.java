@@ -945,7 +945,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         Bitstream bitstreamOne;
         try (InputStream is = IOUtils.toInputStream(bitstreamOneContent, CharEncoding.UTF_8)) {
             bitstreamOne  = BitstreamBuilder.createBitstream(context, bundle, is)
-                                            .withName("bistream one")
+                                            .withName("bitstream one")
                                             .build();
         }
 
@@ -953,7 +953,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         Bitstream bitstreamTwo;
         try (InputStream is = IOUtils.toInputStream(bitstreamTwoContent, CharEncoding.UTF_8)) {
             bitstreamTwo  = BitstreamBuilder.createBitstream(context, bundle, is)
-                                            .withName("bistream two")
+                                            .withName("bitstream two")
                                             .build();
         }
 
@@ -1190,7 +1190,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             String bitstreamContent = "Dummy content";
             try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
                 BitstreamBuilder.createBitstream(context, bundle, is)
-                                .withName("bistream")
+                                .withName("bitstream")
                                 .build();
             }
         }
@@ -1299,7 +1299,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             String bitstreamContent = "Dummy content";
             try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
                 BitstreamBuilder.createBitstream(context, bundle, is)
-                                .withName("bistream")
+                                .withName("bitstream")
                                 .build();
             }
         }
@@ -1406,7 +1406,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             String bitstreamContent = "Dummy content";
             try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
                 BitstreamBuilder.createBitstream(context, bundle, is)
-                                .withName("bistream")
+                                .withName("bitstream")
                                 .build();
             }
         }
@@ -1635,11 +1635,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             matches(Constants.READ, anonymousGroup, "lease", TYPE_CUSTOM, null, "2023-06-24", null)
         ));
 
-        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), hasSize(2));
-        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), containsInAnyOrder(
-            matches(READ, anonymousGroup, "openaccess", TYPE_CUSTOM),
-            matches(Constants.READ, anonymousGroup, "lease", TYPE_CUSTOM, null, "2023-06-24", null)
-        ));
+        // Unlike the previous bundles, we expect TEXT bundle and bitstreams to inherit NO policies from the
+        // item as TEXT is in the default "restricted bundles" list.
+        assertThat(textBundle.getBitstreams().get(0).getResourcePolicies(), hasSize(0));
     }
 
     @Test
@@ -1755,7 +1753,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstreamOne =
                 BitstreamBuilder.createBitstream(context, bundleOne, is)
-                                .withName("bistream of bundle one")
+                                .withName("bitstream of bundle one")
                                 .build();
         }
 

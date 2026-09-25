@@ -55,7 +55,7 @@ public class EtdUnitNameReplaceOperation<R> extends PatchOperation<R> {
     /**
      * Checks whether the name of EtdUnit has an existing value to replace
      *
-     * @param unit Object on which patch is being done
+     * @param etdUnit Object on which patch is being done
      */
     private void checkModelForExistingValue(EtdUnit etdUnit) {
         if (etdUnit.getName() == null) {

@@ -3,7 +3,7 @@
 **Note:** The following steps describe retrieving a DRUM DSpace database
 snapshot from Kubernetes for use with DRUM for local development.
 
-1) Switch the appropriate Kubernetes namespace from which the database snapshot
+1) Switch to the Kubernetes namespace from which the database snapshot
    should be retrieved (the following example uses the Kubernetes "test"
    namespace):
 
@@ -15,12 +15,8 @@ snapshot from Kubernetes for use with DRUM for local development.
    placing the database dump in the `postgres-init` subdirectory:
 
     ```bash
-    $ kubectl exec drum-db-0 -- pg_dump -Fc -C -O -U drum -d drum > postgres-init/drum-db.dump
+    $ kubectl exec drum-db-0 -- pg_dump -O -U drum -d drum > postgres-init/drum.sql
     ```
-
-    **Note:** The output file MUST use a ".dump" extension, in order for the
-   "pg_restore.sh" script to process it, see
-   "[postgres-init/README.md](../../postgres-init/README.md)"
 
 3) (Optional) This step can be skipped, if you are following the instructions in
    [dspace/docs/DockerDevelopmentEnvironment.md](DockerDevelopmentEnvironment.md).
@@ -28,7 +24,7 @@ snapshot from Kubernetes for use with DRUM for local development.
    Start the "dspacedb" container and wait for the restore to complete.
 
     ```bash
-    $ docker compose -p d8 up -d dspacedb
+    $ docker compose -p d9 up -d dspacedb
     ```
 
     To determine if the restore is complete, run the following command, and wait

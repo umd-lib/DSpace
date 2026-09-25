@@ -362,7 +362,7 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // Search by name (case insensitive)
         getClient(authToken).perform(get("/api/core/etdunits/search/byMetadata")
-            .param("query", etdunit1.getName().toLowerCase()))
+            .param("query", etdunit1.getName().toLowerCase(Locale.getDefault())))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.etdunits", Matchers.containsInAnyOrder(

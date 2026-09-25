@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -199,15 +200,19 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
         assertTrue("The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle",
                 bitstreams.size() == 1);
-        assertTrue("The text bistream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]",
+        assertTrue("The text bitstream in the " + item.getName() + " is NOT named properly [" + expectedFileName + "]",
                 StringUtils.equals(bitstreams.get(0).getName(), expectedFileName));
-        assertTrue("The text bistream in the " + item.getName() + " doesn't contain the proper content ["
+        assertTrue("The text bitstream in the " + item.getName() + " doesn't contain the proper content ["
                 + expectedContent + "]", StringUtils.contains(getContent(bitstreams.get(0)), expectedContent));
     }
 
     private CharSequence getContent(Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
+        // TEXT bundles are now expected to be admin-only, and this test does not care about authZ
+        context.turnOffAuthorisationSystem();
         try (InputStream input = bitstreamService.retrieve(context, bitstream)) {
-            return IOUtils.toString(input, "UTF-8");
+            return IOUtils.toString(input, StandardCharsets.UTF_8);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

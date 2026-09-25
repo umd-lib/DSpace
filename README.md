@@ -51,10 +51,10 @@ Confluence for information about setting up a MacBook to use the Kubernetes
    where \<DOCKER_IMAGE_TAG> is the Docker image tag to associate with the
    Docker images. This will typically be the Git tag for the DRUM version,
    or some other identifier, such as a Git commit hash. For example, using the
-   Git tag of "8.2-drum-0":
+   Git tag of "9.4-drum-0":
 
     ```bash
-    $ export DRUM_TAG=8.2-drum-0
+    $ export DRUM_TAG=9.4-drum-0
     ```
 
 4) Set up a "DRUM_DIR" environment variable referring to the current
@@ -70,12 +70,12 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ kubectl config use-context build
     ```
 
-6) Create the "docker.lib.umd.edu/drum-dependencies-8_x" Docker image. This
+6) Create the "docker.lib.umd.edu/drum-dependencies-9_x" Docker image. This
    image is used to pre-cache Maven downloads that will be used in subsequent
    DSpace docker builds:
 
     ```bash
-    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-8_x:latest -f Dockerfile.dependencies .
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-9_x:latest -f Dockerfile.dependencies .
     ```
 
 7) Create the "docker.lib.umd.edu/drum" Docker image:
@@ -84,27 +84,7 @@ Confluence for information about setting up a MacBook to use the Kubernetes
     $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum:$DRUM_TAG .
     ```
 
-8) Create the "docker.lib.umd.edu/dspace-postgres", which is a Postgres image
-   with "pgcrypto" module:
-
-    **Note:** The "Dockerfile" for the "dspace-postgres" image specifies
-    only the major Postgres version as the base image. This allows Postgres
-    minor version updates to be retrieved automatically. It may not be
-    necessary to create new "dspace-postgres" image versions for every DRUM
-    patch or hotfix version increment.
-
-    ```bash
-    $ cd $DRUM_DIR/dspace/src/main/docker/dspace-postgres-pgcrypto
-
-    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/dspace-postgres:$DRUM_TAG .
-    ```
-
-9) Create the "docker.lib.umd.edu/drum-solr":
-
-    **Note:** The "Dockerfile" for the "drum-solr" image specifies only the
-    major Solr version as the base image. This allows Solr minor version updates
-    to be retrieved automatically. It may not be necessary to create new
-    "drum-solr" image versions for every DRUM patch or hotfix version increment.
+8) Create the "docker.lib.umd.edu/drum-solr":
 
     ```bash
     $ cd $DRUM_DIR/dspace/solr
@@ -117,7 +97,7 @@ Confluence for information about setting up a MacBook to use the Kubernetes
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
   base DSpace functionality
 * [DrumTestPlan](dspace/docs/DrumTestPlan.md) - Covers some manual tests for
-customized features and deployment configurations.
+  customized features and deployment configurations.
 * [DrumConfigurationCustomization](dspace/docs/DrumConfigurationCustomization.md) -
   Information about customizing DSpace for DRUM.
 * [docs](dspace/docs) - additional documentation
@@ -145,8 +125,8 @@ The following customizations *do not* need to be commented:
   tabs in the modified DSpace file being automatically converted to spaces by
   VS Code, or an end-of-file line.
 
-The main goal is to make it immediately when performing DSpace version upgrades
-whether a change in a file is due to an explicit UMD customization.
+The main goal is to make it immediately obvious when performing DSpace version
+upgrades whether a change in a file is due to an explicit UMD customization.
 
 ## License
 

@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -128,7 +127,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
-                            Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                            fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
                     );
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());
@@ -470,7 +469,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
      * by remove all resource policies and
      * set derivative bitstreams to be publicly accessible or
      * replace derivative bitstreams policies using
-     * the same in the source bitstream.
+     * the same in the source bitstream. If the bundle name
+     * is configured in the list of restricted-bundles it will
+     * have all policies cleared
      *
      * @param context the context
      * @param bitstream derivative bitstream
@@ -483,6 +484,16 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                                                      Bitstream source) throws SQLException, AuthorizeException {
 
         authorizeService.removeAllPolicies(context, bitstream);
+
+        // Return early after clearing policies if any bundle of this bitstream
+        // is in the list of admin-only bundles
+        var restrictedBundles = List.of(configurationService.getArrayProperty(
+            "core.authorization.restricted-bundle",Constants.DEFAULT_RESTRICTED_BUNDLES));
+        for (Bundle bundle : bitstream.getBundles()) {
+            if (restrictedBundles.contains(bundle.getName())) {
+                return;
+            }
+        }
 
         if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
             Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
