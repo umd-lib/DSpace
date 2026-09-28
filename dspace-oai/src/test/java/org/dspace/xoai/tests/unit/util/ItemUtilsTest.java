@@ -8,21 +8,13 @@
 package org.dspace.xoai.tests.unit.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.SQLException;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -30,7 +22,6 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -51,7 +42,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -115,18 +105,25 @@ public class ItemUtilsTest extends AbstractUnitTest {
 
             // Create ORIGINAL bundle with a bitstream
             originalBundle = bundleService.create(context, item, Constants.DEFAULT_BUNDLE_NAME);
-            // Use BitstreamService.create with InputStream (null for empty bitstream in tests)
-            originalBitstream = bitstreamService.create(context, originalBundle, null);
+            originalBitstream = bitstreamService.create(context, originalBundle,
+                new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
             originalBitstream.setName(context, "test.pdf");
             originalBitstream.setSource(context, "test.pdf");
             itemService.update(context, item);
 
             // Create METADATA bundle (non-ORIGINAL) with a bitstream containing PII
             metadataBundle = bundleService.create(context, item, "METADATA");
-            metadataBitstream = bitstreamService.create(context, metadataBundle, null);
+            metadataBitstream = bitstreamService.create(context, metadataBundle,
+                new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
             metadataBitstream.setName(context, "proquest.xml");
             metadataBitstream.setSource(context, "proquest.xml");
             itemService.update(context, item);
+
+            // New bundles/bitstreams inherit the item's Anonymous READ policy (from the collection
+            // defaults), so remove it to simulate a restricted METADATA bundle and bitstream.
+            // Individual tests grant READ back where needed.
+            authorizeService.removePoliciesActionFilter(context, metadataBundle, Constants.READ);
+            authorizeService.removePoliciesActionFilter(context, metadataBitstream, Constants.READ);
 
             context.restoreAuthSystemState();
 
@@ -156,20 +153,20 @@ public class ItemUtilsTest extends AbstractUnitTest {
             context.restoreAuthSystemState();
         } catch (Exception e) {
             throw new RuntimeException("Error in test cleanup", e);
+        } finally {
+            // Always release the context, so a cleanup failure doesn't break subsequent tests
+            super.destroy();
         }
-        super.destroy();
     }
 
     /**
-     * Helper method to create an unauthenticated Context (READ_ONLY mode like OAI indexer uses).
+     * Helper method to make the test Context unauthenticated (Anonymous), simulating the OAI
+     * indexer. A separate Context is not used because all Contexts on a thread share the same
+     * Hibernate session, so aborting it would roll back this test's (uncommitted) data.
      */
-    private Context createAnonymousContext() throws SQLException {
-        Context anonymousContext = new Context(Context.Mode.READ_ONLY);
-        anonymousContext.turnOffAuthorisationSystem();
-        // Ensure no authenticated user - this simulates OAI indexer behavior
-        anonymousContext.setCurrentUser(null);
-        anonymousContext.restoreAuthSystemState();
-        return anonymousContext;
+    private Context createAnonymousContext() {
+        context.setCurrentUser(null);
+        return context;
     }
 
     /**
@@ -225,7 +222,7 @@ public class ItemUtilsTest extends AbstractUnitTest {
             assertThat("Original filename should be included",
                     ElementUtils.getFieldValue(bitstreamElement, "originalName"), equalTo("test.pdf"));
         } finally {
-            anonymousContext.abort();
+            context.setCurrentUser(eperson);
         }
     }
 
@@ -255,7 +252,7 @@ public class ItemUtilsTest extends AbstractUnitTest {
             Element originalBundleElement = findBundleByName(bundles, Constants.DEFAULT_BUNDLE_NAME);
             assertNotNull("ORIGINAL bundle should be present", originalBundleElement);
         } finally {
-            anonymousContext.abort();
+            context.setCurrentUser(eperson);
         }
     }
 
@@ -289,7 +286,7 @@ public class ItemUtilsTest extends AbstractUnitTest {
             assertThat("Bitstream should be excluded (bitstream not readable)",
                     getBitstreamCount(bitstreams), equalTo(0));
         } finally {
-            anonymousContext.abort();
+            context.setCurrentUser(eperson);
         }
     }
 
@@ -316,7 +313,7 @@ public class ItemUtilsTest extends AbstractUnitTest {
             Element originalBundleElement = findBundleByName(bundles, Constants.DEFAULT_BUNDLE_NAME);
             assertNotNull("ORIGINAL bundle should always be included", originalBundleElement);
         } finally {
-            anonymousContext.abort();
+            context.setCurrentUser(eperson);
         }
     }
 
