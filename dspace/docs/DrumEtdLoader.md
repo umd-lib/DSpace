@@ -95,6 +95,73 @@ dspace filter-media -f -i <handle>
 
 afterwards, so that the derivatives match the new access.
 
+## Redaction of the ProQuest Metadata XML
+
+The ETD Loader stores the ProQuest "_DATA.xml" metadata file of each package
+in the "METADATA" bundle of the item. The file follows the ProQuest "DISS"
+schema and includes the student's personal contact information, which DRUM
+does not use.
+
+DRUM keeps storing the file, but removes the elements listed below, which
+hold the known personal information in the file that is not published with
+the thesis, before storing it (LIBDRUM-1044). An element is removed
+entirely, with all of its children, so that any child element ProQuest adds
+later is removed too.
+
+The redaction is done by "EtdMetadataRedactor" as soon as the file is read, so
+the debug-level log of the metadata is redacted as well. The stored file is
+re-serialized as UTF-8, whatever the encoding of the file ProQuest sent.
+
+### Redacted elements
+
+The following elements are removed wherever they appear in the file
+(ProQuest sends them under "/DISS_submission/DISS_authorship/DISS_author"):
+
+* "DISS_contact" -- every occurrence, whatever its "type". Contains
+  "DISS_contact_effdt", "DISS_email" and "DISS_address" ("DISS_addrline",
+  "DISS_city", "DISS_st", "DISS_pcode", "DISS_country").
+* "DISS_citizenship" -- the student's citizenship.
+
+ProQuest normally sends two "DISS_contact" elements: the "current" contact
+(typically the student's university address and email) and the "future"
+contact (typically a home address and personal email). Both are removed.
+
+### Retained elements
+
+All other elements are kept, either because DRUM uses them, or because they
+contain no personal information beyond what is published with the thesis.
+
+Used by DRUM (paths relative to "/DISS_submission"):
+
+* "DISS_authorship/DISS_author/DISS_name" -- "dc.contributor.author"
+* "DISS_description/DISS_title" -- "dc.title", and the duplicate title check
+* "DISS_description/DISS_degree" -- "dc.type"
+* "DISS_description/DISS_advisor/DISS_name" -- "dc.contributor.advisor"
+* "DISS_description/DISS_dates/DISS_accept_date" -- "dc.date.issued"
+* "DISS_description/DISS_institution/DISS_inst_contact" --
+  "dc.contributor.department", and the ETD Department collection mapping
+* "DISS_description/DISS_categorization/DISS_category" --
+  "dc.subject.pqcontrolled"
+* "DISS_description/DISS_categorization/DISS_keyword" --
+  "dc.subject.pquncontrolled"
+* "DISS_description/DISS_categorization/DISS_language" -- "dc.language.iso"
+* "DISS_content/DISS_abstract" -- "dc.description.abstract"
+* "DISS_restriction/DISS_sales_restriction" -- the embargo ("code" and
+  "remove" attributes)
+* "DISS_repository/DISS_delayed_release" and "DISS_access_option" --
+  checking delayed-release requests
+* "DISS_content/DISS_binary" -- identifying the thesis PDF
+
+"DISS_authorship/DISS_author/DISS_orcid" is not used by DRUM, but is kept,
+as an ORCID iD is a public identifier.
+
+Not used by DRUM, but not personal information:
+"DISS_description/DISS_cmte_member" (committee member names, which appear in
+the thesis), "DISS_description/DISS_identifiers", "DISS_comp_date", the
+remaining "DISS_institution" and "DISS_repository" elements,
+"DISS_creative_commons_license", and the attributes of "DISS_submission" and
+"DISS_description".
+
 ## ETD Loader Components
 
 The ETD Loader functionality consists of:

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +44,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.EtdUnitService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -75,6 +77,8 @@ public class EtdLoaderTest extends AbstractUnitTest {
     private TestLog4JLogger etdLogger;
 
     private final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private final InstallItemService installItemService = ContentServiceFactory.getInstance()
             .getInstallItemService();
@@ -355,6 +359,45 @@ public class EtdLoaderTest extends AbstractUnitTest {
         List<ResourcePolicy> supplementaryPolicies = groupPolicies(supplementary);
         assertEquals(1, supplementaryPolicies.size());
         assertEquals(testEtdLoaderConfig.getReviewGroup(context), supplementaryPolicies.get(0).getGroup());
+    }
+
+    @Test
+    public void testStoredMetadataIsRedacted() throws Exception {
+        // The item is routed to review only so that it can be found as the
+        // single workflow item; the metadata is stored the same way for an
+        // item that is installed directly.
+        testEtdLoaderConfig.addWorkflowReviewers(context, eperson);
+        testEtdLoaderConfig.setReviewEnabled(true);
+        testEtdLoaderConfig.setEtdLoaderScriptProperties(
+            createZipWithSupplementaryFile("appendix.wav"), eperson);
+
+        assertFalse(EtdLoader.run());
+
+        Item item = testEtdLoaderConfig.getOnlyWorkflowItem(context).getItem();
+
+        List<Bundle> bundles = item.getBundles("METADATA");
+        assertEquals(1, bundles.size());
+        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
+        assertEquals(1, bitstreams.size());
+        assertEquals("Author_umd_0117N_12345_DATA.xml", bitstreams.get(0).getName());
+
+        String stored;
+        try (InputStream is = bitstreamService.retrieve(context, bitstreams.get(0))) {
+            stored = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        // The student's contact information and citizenship are removed
+        assertFalse(stored.contains("<DISS_contact"));
+        assertFalse(stored.contains("<DISS_citizenship"));
+
+        // The elements that DRUM uses, and the ORCID, are kept
+        assertThat(stored, containsString("<DISS_surname>"));
+        assertThat(stored, containsString("<DISS_orcid"));
+        assertThat(stored, containsString("<DISS_inst_contact>ETD Test Unit</DISS_inst_contact>"));
+
+        // The metadata derived from the XML is unaffected
+        assertEquals("ETD Test Unit", itemService.getMetadataFirstValue(
+            item, MetadataSchemaEnum.DC.getName(), "contributor", "department", Item.ANY));
     }
 
     /**

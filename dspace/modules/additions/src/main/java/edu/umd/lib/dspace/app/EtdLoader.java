@@ -5,6 +5,7 @@
 
 package edu.umd.lib.dspace.app;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -360,10 +361,13 @@ public class EtdLoader {
     /******************************************************** addBitstreams */
     /**
      * Add bitstreams to the item.
+     *
+     * The ProQuest metadata file is stored from the given (redacted) metadata
+     * document, rather than from the Zip file.
      */
 
     public static List<Bitstream> addBitstreams(Context context, Item item, ZipFile zip,
-            EtdPackage etdPackage) throws Exception {
+            EtdPackage etdPackage, Document meta) throws Exception {
         List files = etdPackage.getFileList();
         int supplementaryCount = etdPackage.getSupplementaryFileNames().size();
 
@@ -372,10 +376,10 @@ public class EtdLoader {
         // Get the METADATA bundle
         Bundle metaBundle = getBundle(context, item, "METADATA");
 
-        // Add the Proquest ETD metadata XML to the METADATA bundle
+        // Add the redacted Proquest ETD metadata XML to the METADATA bundle
         String strFileName = (String) files.get(0);
-        ZipEntry ze = (ZipEntry) files.get(1);
-        createBitstream(context, metaBundle, strFileName, zip.getInputStream(ze));
+        createBitstream(context, metaBundle, strFileName,
+                new ByteArrayInputStream(EtdMetadataRedactor.toBytes(meta)));
 
         // The supplementary files are the last entries of the list, and are
         // returned so that they can be restricted when the item is routed to
@@ -387,7 +391,7 @@ public class EtdLoader {
         // Loop through the files
         for (int i = 2; i < files.size(); i += 2) {
             strFileName = (String) files.get(i);
-            ze = (ZipEntry) files.get(i + 1);
+            ZipEntry ze = (ZipEntry) files.get(i + 1);
 
             Bitstream bitstream = createBitstream(context, originalBundle, strFileName, zip.getInputStream(ze));
 
@@ -814,6 +818,12 @@ public class EtdLoader {
             ZipEntry ze = (ZipEntry) files.get(1);
             Document meta = reader
                     .read(new InputSource(zip.getInputStream(ze)));
+
+            // Remove the personal information that DRUM does not use, before
+            // the metadata is logged or stored
+            int redacted = EtdMetadataRedactor.redact(meta);
+            log.debug("Redacted " + redacted + " element(s) from the ETD metadata");
+
             if (log.isDebugEnabled()) {
                 log.debug("ETD metadata:\n" + toString(meta));
             }
@@ -849,7 +859,7 @@ public class EtdLoader {
             wi.addMappedCollections(new ArrayList<Collection>(sCollections));
 
             // Add bitstreams
-            List<Bitstream> supplementaryBitstreams = addBitstreams(context, item, zip, etdPackage);
+            List<Bitstream> supplementaryBitstreams = addBitstreams(context, item, zip, etdPackage, meta);
 
             if (needsReview) {
                 // Restrict the supplementary files, apply any embargo, and
