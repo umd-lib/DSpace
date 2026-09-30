@@ -297,6 +297,21 @@ drum.ldap.read.timeout = 5000
 drum.ldap.cacheTimeout = 300000
 # End UMD Customization
 
+# UMD Customization
+################################
+# AUTHORIZATION CONFIGURATION #
+################################
+# Any bundles listed here will have READ access only by ADMIN users
+# Default restricted bundle names are: TEXT, LICENSE, SWORD
+#
+# Add 'METADATA' and 'PRESERVATION' to default restricted bundles list
+core.authorization.restricted-bundle = TEXT
+core.authorization.restricted-bundle = LICENSE
+core.authorization.restricted-bundle = SWORD
+core.authorization.restricted-bundle = METADATA
+core.authorization.restricted-bundle = PRESERVATION
+# End UMD Customization
+
 #####################
 # REST API SETTINGS #
 #####################
