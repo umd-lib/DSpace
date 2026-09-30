@@ -114,5 +114,15 @@
         <property name="processingAction" ref="dataCommunityCollectionMappingAPI"/>
         <property name="requiresUI" value="false"/>
     </bean>
+
+    <bean id="etdDepartmentCollectionMappingAPI"
+        class="edu.umd.lib.dspace.xmlworkflow.state.actions.EtdDepartmentCollectionMappingAction"
+        scope="prototype"/>
+
+    <bean id="etddepartmentcollectionmappingaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="etddepartmentcollectionmappingaction"/>
+        <property name="processingAction" ref="etdDepartmentCollectionMappingAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
     <!-- End UMD Customization -->
 </beans>
