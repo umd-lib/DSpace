@@ -483,18 +483,29 @@ instead.
 
 <https://drum-test.lib.umd.edu/robots.txt>
 
-Verify the contents of a "robots.txt" file is displayed, and contains the
-following uncommented line (among many others):
+* **qa/test/sandbox**: Verify that a "robots.txt" that disallows all crawling is
+  displayed, in accordance with the
+  ["Access to Web Content"][access-to-web-content] SSDR policy.
 
-```text
-Disallow: /browse/*
-```
+* **production**: Verify the contents of a "robots.txt" file is displayed, and
+  contains the following uncommented line (among many others):
+
+  ```text
+  Disallow: /browse/*
+  ```
 
 16.2) In a web browser go to
 
 <https://api.drum-test.lib.umd.edu/robots.txt>
 
-and verify that the "robots.txt" file disallows all crawling.
+* **qa/test/sandbox**: Verify that a "robots.txt" that disallows all crawling is
+  displayed, in accordance with the
+  ["Access to Web Content"][access-to-web-content] SSDR policy.
+
+* **production**: Verify that the contents are the same as the "frontend"
+  robots.txt from the previous step. The backend uses the same "robots.txt" as
+  the frontend to ensure that crawlers can access backend resources
+  (see LIBDRUM-1053).
 
 ### 17) sitemap.xml
 
@@ -602,3 +613,6 @@ be displayed.
 button. A "Delete Community" confirmation page will be displayed. Left-click
 the "Confirm" button on the page, and verify that a notification is displayed
 indicating that the community was deleted.
+
+---
+[access-to-web-content]: https://umd-dit.atlassian.net/wiki/x/KQBcfQ
