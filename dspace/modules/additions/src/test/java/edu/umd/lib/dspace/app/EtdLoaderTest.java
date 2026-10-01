@@ -400,6 +400,33 @@ public class EtdLoaderTest extends AbstractUnitTest {
             item, MetadataSchemaEnum.DC.getName(), "contributor", "department", Item.ANY));
     }
 
+    @Test
+    public void testExternalEntityInMetadataIsRejected() throws Exception {
+        // A local file that a crafted metadata file tries to read into the title
+        File secretFile = File.createTempFile("etdloader-secret", ".txt");
+        secretFile.deleteOnExit();
+        Files.writeString(secretFile.toPath(), "SECRET-FILE-CONTENTS");
+
+        String doctype = "<!DOCTYPE DISS_submission [<!ENTITY xxe SYSTEM \""
+            + secretFile.toURI() + "\">]>\n";
+
+        File zipFile = EtdZipFileBuilder.createFromResource(
+            testEtdLoaderConfig.newZipFile("etdadmin_upload_xxe.zip"),
+            "/edu/umd/lib/dspace/app/etdadmin_upload_test_one_item.zip",
+            xml -> xml
+                .replace("?>", "?>\n" + doctype)
+                .replace("<DISS_title>", "<DISS_title>&xxe;"),
+            Map.of());
+        testEtdLoaderConfig.setEtdLoaderScriptProperties(zipFile, eperson);
+
+        EtdLoader.run();
+
+        String logOutput = etdLogger.getLog();
+        assertThat(logOutput, containsString("DOCTYPE is disallowed"));
+        assertThat(logOutput, containsString("Records written: 0"));
+        assertFalse(logOutput.contains("SECRET-FILE-CONTENTS"));
+    }
+
     /**
      * Returns an ETD Zip file containing the single item test resource, plus a
      * supplementary file with the given name.
