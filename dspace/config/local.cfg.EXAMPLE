@@ -418,12 +418,6 @@ drum.etdloader.review.enabled = false
 # Group that supplementary files are restricted to while an item is in review
 drum.etdloader.review.group = Administrator
 
-# Environment Banner configuration
-# Leave blank on production environment
-# Valid options: local, dev, stage
-drum.environment.name = local
-drum.environment.bannerText = Local Environment
-
 # Data Community
 data.community.handle = 1903/27669
 
