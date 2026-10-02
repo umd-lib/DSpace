@@ -92,6 +92,7 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 // SQL
 // IO
 // XML
@@ -167,7 +168,7 @@ public class EtdLoader {
 
     static long lReview = 0;
 
-    static SAXReader reader = new SAXReader();
+    static SAXReader reader = createReader();
 
     static Transformer tDC = null;
 
@@ -760,6 +761,32 @@ public class EtdLoader {
         } else {
             return "Text.";
         }
+    }
+
+    /********************************************************* createReader */
+    /**
+     * Returns a reader for the ProQuest metadata XML that does not process
+     * DOCTYPE declarations or external entities, so that a crafted ETD
+     * package cannot read local files or make network requests (XXE). The
+     * settings match those of XMLUtils.getDocumentBuilderFactory(), which
+     * does not support dom4j.
+     *
+     * @return the hardened reader
+     */
+    static SAXReader createReader() {
+        SAXReader saxReader = new SAXReader();
+        try {
+            // Disallow DOCTYPE declarations, which prevents entity declarations
+            saxReader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            // Disable external entities
+            saxReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            saxReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            // Disable loading of external DTDs
+            saxReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        } catch (SAXException e) {
+            throw new IllegalStateException("Unable to configure the ETD metadata XML reader", e);
+        }
+        return saxReader;
     }
 
     /************************************************************* getXPath */
