@@ -75,6 +75,10 @@ See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 
 See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 
+## OAI-PMH
+
+See [dspace/docs/DrumOaiPmh.md](DrumOaiPmh.md).
+
 ## Community Groups
 
 * LIBDRUM-664 - Enable communities to organized to groups (i.e.,
