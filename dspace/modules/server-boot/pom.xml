@@ -106,6 +106,55 @@
 
     <build>
         <plugins>
+            <!-- UMD Customization -->
+            <!--
+            By default, Spring Boot generates "BOOT-INF/classpath.idx", used to
+            define the Java CLASSPATH when running in Docker, with the jar
+            files in alphabetical order.
+
+            The dspace/modules/server module contains overrides of DSpace
+            classes in the "dspace-server-webapp" module, and so must appear
+            before the dspace-server-webapp" module in the classpath.
+
+            The following unpacks the classes in the "server" module into the
+            BOOT-INF/classes directory in the "server-boot.jar", places them
+            ahead of all the other jars in the Java CLASSPATH, including those
+            in the "dspace-server-webapp" module, forcing the override.
+
+            Note: The classes in the "additions" jar also unpacked.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>overlay-custom-server-classes</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace.modules</groupId>
+                                    <artifactId>server</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>classes</classifier>
+                                    <outputDirectory>
+                                        ${project.build.outputDirectory}
+                                    </outputDirectory>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                            <excludes>
+                                META-INF/MANIFEST.MF
+                            </excludes>
+                        </configuration>
+                      </execution>
+                </executions>
+            </plugin>
+            <!-- End UMD Customization -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -115,6 +164,26 @@
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                        <!-- UMD Customization -->
+                        <!--
+                         The "additions and "server" module classes have
+                         already been loaded by the customization above, so
+                         exclude them from the list of jars.
+                        -->
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.dspace.modules</groupId>
+                                    <artifactId>server</artifactId>
+                                    <classifier>classes</classifier>
+                                </exclude>
+                                <exclude>
+                                    <groupId>org.dspace.modules</groupId>
+                                    <artifactId>additions</artifactId>
+                                </exclude>
+                            </excludes>
+                        </configuration>
+                        <!-- End UMD Customization -->
                     </execution>
             </executions>
             </plugin>
