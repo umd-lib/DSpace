@@ -310,6 +310,7 @@ core.authorization.restricted-bundle = LICENSE
 core.authorization.restricted-bundle = SWORD
 core.authorization.restricted-bundle = METADATA
 core.authorization.restricted-bundle = PRESERVATION
+core.authorization.restricted-bundle = CC-LICENSE
 # End UMD Customization
 
 #####################
