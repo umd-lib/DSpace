@@ -63,6 +63,77 @@ A bitstream that is that available to the user due to an IP address restriction
 will show the "lock" icon next to the download link, as the user does not have
 "READ" permission for the bitstream.
 
+## Restricted Bundles
+
+The "core.authorization.restricted-bundle" configuration property lists the
+bundles whose contents are only accessible to administrators. Stock DSpace
+restricts the "TEXT", "LICENSE" and "SWORD" bundles by default. DRUM extends the
+list (see "dspace/config/local.cfg.EXAMPLE") with the "METADATA",
+"PRESERVATION" and "CC-LICENSE" bundles, so that only the "ORIGINAL" and
+"THUMBNAIL" bundles are publicly accessible.
+
+**Note:** Setting the property replaces the stock default list, so the stock
+bundles must also be listed.
+
+A bundle is restricted by removing *all* the resource policies from the bundle
+and its bitstreams (an object with no resource policies is only accessible to
+administrators). Stock DSpace does this when an item is installed, when a bundle
+or bitstream is added to an archived item, and when "filter-media" creates a
+derivative bitstream (such as a "TEXT" bitstream). It does not update existing
+content.
+
+The Creative Commons license of an item is still displayed on the item page, as
+it comes from the "dc.rights" and "dc.rights.uri" metadata, not the
+"CC-LICENSE" bundle.
+
+### Restricting Existing Content
+
+The [scripts/restrict-bundle-policies.sql](../../scripts/restrict-bundle-policies.sql)
+PostgreSQL script applies the same restriction to the bundles of existing
+archived and withdrawn items. Withdrawn items are included because reinstating
+an item restores its "READ" resource policies. The script:
+
+* reports the bundle names in DRUM and the resource policies to be removed
+* runs as a dry run (ending with "ROLLBACK") unless the "apply" variable is set
+* copies the removed resource policies to the
+  "drum_restricted_bundle_rp_backup" table before deleting them
+* can be safely run more than once
+
+The list of bundle names in the script must match the
+"core.authorization.restricted-bundle" configuration.
+
+To run the script against a Kubernetes namespace:
+
+```bash
+# Dry run (prints the report, then rolls back)
+$ kubectl exec -i drum-db-0 -- psql -U drum -d drum -v ON_ERROR_STOP=1 \
+    < scripts/restrict-bundle-policies.sql
+
+# Apply
+$ kubectl exec -i drum-db-0 -- psql -U drum -d drum -v ON_ERROR_STOP=1 -v apply=1 \
+    < scripts/restrict-bundle-policies.sql
+```
+
+In the local development environment, use `docker exec -i dspacedb` in place of
+`kubectl exec -i drum-db-0 --`.
+
+After applying the script, rebuild the "oai" Solr core, which stores the
+license text and bitstream resource policies of each item:
+
+```bash
+$ kubectl exec drum-0 -- /dspace/bin/dspace oai import -c
+```
+
+The script must be re-run after restoring a database dump that was taken
+before the script was applied.
+
+To restore the removed resource policies:
+
+```sql
+INSERT INTO resourcepolicy SELECT * FROM drum_restricted_bundle_rp_backup
+  ON CONFLICT (policy_id) DO NOTHING;
+```
+
 ## Embargo Functionality in DRUM
 
 UMD began embargoing items before the current DSpace embargo functionality
