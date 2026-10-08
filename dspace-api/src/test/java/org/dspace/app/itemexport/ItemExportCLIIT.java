@@ -38,6 +38,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -46,6 +47,9 @@ import org.junit.Test;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
+// UMD Customization
+@Ignore("UMD - These tests consistently fail when run on macOS, see https://github.com/DSpace/DSpace/issues/13120")
+// End UMD Customization
 public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String zipFileName = "saf-export.zip";
