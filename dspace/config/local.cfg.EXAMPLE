@@ -239,6 +239,11 @@ handle.dir = ${dspace.dir}/handle-server
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication
 # End UMD Customization
 
+# UMD Customization
+# UMD-custom CAS authentication/authorization
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.CASAuthentication
+# End UMD Customization
+
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
 
@@ -259,11 +264,6 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authen
 # Enabled by default in authentication.cfg
 # UMD Customization
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
-# End UMD Customization
-
-# UMD Customization
-# UMD-custom CAS authentication/authorization
-plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.CASAuthentication
 # End UMD Customization
 
 # UMD Customization
