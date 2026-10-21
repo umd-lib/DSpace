@@ -76,12 +76,27 @@ For a routed item:
 
 ### Prerequisites
 
-The "drum.etdloader.collection" collection **must have workflow reviewers**
-before the review workflow is enabled. DSpace archives a submission immediately
-if no workflow step has any members, which would publish exactly the files that
-need review. The ETD Loader checks for this: if the collection has no
-reviewers, the item is skipped, an error is logged, and the Zip file stays in
-the "incoming" directory to be retried on the next run.
+The "drum.etdloader.collection" collection **must** have members in at
+least **one** of the review workflow roles ("Reviewers", "Editors", or
+"Final Editors") before the review workflow is enabled. The ETD Loader checks
+for this: if none of the review workflow roles has a member, the item is
+skipped, an error is logged, and the Zip file stays in the "incoming" directory
+to be retried on the next run.
+
+This role membership check overrides the default DSpace behavior of archiving a
+submission immediately if no workflow step has any members (and thus preventing
+the publication of exactly the files that need review).
+
+Also note that, as per standard DSpace workflow behavior, when submitted to the
+workflow, the submission will stop at the first workflow step that has members.
+So unless there is a need for separate reviewers and editors, typically the
+"Editors" role (which can accept, reject, and edit submissions) would be the
+only role populated, and the "Reviewers" role (which can only accept and reject
+submissions, but not edit) would be empty. Due to role permissions, editors
+cannot claim submissions until approved by a reviewer. A user may be in *both*
+roles, but this would still require "double review" -- the user would need to
+claim the submission once as a reviewer, approve the submission, then claim the
+submission again as the editor.
 
 ### Notes for reviewers
 
