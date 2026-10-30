@@ -412,6 +412,28 @@ request.item.type =
 # Suppress "Statistics" menu entry in the navbar for non-admins
 usage-statistics.authorization.admin.usage=true
 
+###################
+# DSPACE RTS ADD-ON
+###################
+# Override settings in dspace/config/modules/replicate.cfg
+
+# Replica store implementation class
+plugin.single.org.dspace.ctask.replicate.ObjectStore = org.dspace.ctask.replicate.store.S3ObjectStore
+
+# Package type
+replicate.packer.pkgtype = bagit
+
+# AWS S3 Region name
+replicate.s3.region-name =
+
+# AWS S3 Bucket name
+replicate.s3.bucket-name =
+
+# Override settings in dspace/config/modules/replicate-bagit.cfg
+
+# BagIt Bag Profile
+replicate-bagit.profile = aptrust
+
 #######################
 # OTHER CONFIGURATION #
 #######################

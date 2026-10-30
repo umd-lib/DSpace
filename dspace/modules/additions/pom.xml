@@ -358,5 +358,40 @@
          <scope>test</scope>
       </dependency>
       <!-- End UMD Customization -->
+
+      <!-- UMD Customization -->
+      <!-- Adding this dependency will install the Replication Task Suite Addon -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-replicate</artifactId>
+         <version>9.4</version>
+         <exclusions>
+            <exclusion>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-core</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>com.amazonaws</groupId>
+               <artifactId>aws-java-sdk-sqs</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-compress</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.hibernate.javax.persistence</groupId>
+               <artifactId>hibernate-jpa-2.1-api</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.httpcomponents</groupId>
+               <artifactId>httpmime</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.springframework.security</groupId>
+               <artifactId>spring-security-core</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <!-- End UMD Customization -->
    </dependencies>
 </project>
