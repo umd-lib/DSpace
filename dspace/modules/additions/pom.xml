@@ -398,6 +398,11 @@
           <artifactId>sts</artifactId>
           <version>2.49.4</version>
       </dependency>
+      <dependency>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>url-connection-client</artifactId>
+          <version>2.49.4</version>
+      </dependency>
       <!-- End UMD Customization -->
    </dependencies>
 </project>
