@@ -143,12 +143,12 @@ docker compose -p d8 up --detach --build dspacesolr
 
 The [atmoz/sftp](https://hub.docker.com/r/atmoz/sftp) docker image used for running the sftp
 container. The `atmoz/sftp` docker repsitory is not maintaining release versions anymore, and
-the updates are pushed to the `latest` tag. In order to avoid using the `latest` tag on the
-k8s deployment, we are pulling the `latest` docker image and tagging it with the current date,
-and pushing it to our internal docker registry.
+the updates are pushed to the `alpine` and `debian` tags. In order to avoid using the mutable
+tag on the k8s deployment, we are pulling the `debian` docker image and tagging it with the
+current date, and pushing it to our internal docker registry.
 
 ```bash
-docker tag atmoz/sftp:latest docker.lib.umd.edu/atmoz_sftp_latest:20210715
+docker tag atmoz/sftp:debian docker.lib.umd.edu/atmoz_sftp_debian:20261103
 
 ## ./test/ folder
 
