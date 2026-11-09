@@ -205,8 +205,8 @@ In the "Creative commons license" section, left-click the
 "Select a license type..." button and verify that the following two options are
 shown (but do not select either of them):
 
-* CC0
-* Creative Commons
+* Creative Commons License (4.0)
+* CC0 1.0 Universal
 
 In the "Deposit license" section, left-click the "I confirm the license above"
 checkbox to select it, and then left-click the "Deposit" button
