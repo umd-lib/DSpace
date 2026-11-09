@@ -395,6 +395,9 @@ websvc.opensearch.tags = IR DRUM DSpace UMDLibraries
 # Statistical Report Configuration Settings
 webui.itemlist.columns = thumbnail, dc.date.issued(date), dc.title, dc.contributor.author
 
+# Creative Commons License settings
+cc.license.classfilter = recombo, mark, certification, CC3.0
+
 ##############################
 # REQUEST ITEM CONFIGURATION #
 ##############################
