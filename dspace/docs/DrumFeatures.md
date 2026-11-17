@@ -29,6 +29,16 @@ information.
   * LIBDRUM-669 - Group membership based on LDAP attributes is displayed in the
     user profile page (see also LIBDRUM-703)
 
+* User self-registration is disabled
+
+  The stock DSpace functionality for user self-registration using an email
+  address and password has been disabled. This is necessary because if a UMD
+  user self-registers their UMD email address (instead of logging in via CAS),
+  they will be unable to log in via CAS because when CAS attempts to create the
+  account, there is already an existing account with the email address.
+
+  Non-UMD users are added manually by administrators.
+
 ## Electronic Theses and Dissertations (ETD)
 
 See [dspace/docs/DrumEtdLoader.md](DrumEtdLoader.md) for additional information.
