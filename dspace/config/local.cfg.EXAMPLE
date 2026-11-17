@@ -295,6 +295,9 @@ drum.ldap.connect.timeout = 1000
 drum.ldap.read.timeout = 5000
 # Expiration time, in milliseconds, for the in-memory LDAP cache.
 drum.ldap.cacheTimeout = 300000
+
+# Disable user self-registration (from dspace/config/modules/authentication-password.cfg)
+user.registration = false
 # End UMD Customization
 
 # UMD Customization

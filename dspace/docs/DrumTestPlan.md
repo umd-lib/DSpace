@@ -106,18 +106,26 @@ UMD Libraries website.
 ### 3) CAS Login
 
 3.1) On the DRUM home page, left-click the "Log In" dropdown in the navigation
-bar, and then left-click the "UMD Login" button. Verify that the browser is
+bar. Verify that the dropdown has the following:
+
+* A "UMD Login" button
+* An "Email Address" textfield
+* A "Password" textfield
+* A "Guest Researcher Login" button (defaults to disabled)
+* A "Registration Help?" link
+
+3.2) Left-click the "UMD Login" button. Verify that the browser is
 redirected to CAS.
 
-3.2) Log in via CAS. Once returned to the DRUM home page, verify that an
+3.3) Log in via CAS. Once returned to the DRUM home page, verify that an
 administrative sidebar is displayed along the left edge of the page.
 
-3.3) In the navigation bar, left-click the "User profile menu and logout"
+3.4) In the navigation bar, left-click the "User profile menu and logout"
 dropdown in the navigation bar (the icon is a person in  silhouette) and verify
 that the dropdown displays the name associated with the CAS account. Left-click
 the "Profile" menu entry in the dropdown. The "Profile" page will be displayed.
 
-3.4) On the "Profile" page, verify that a "Researcher Profile" panel is *not*
+3.5) On the "Profile" page, verify that a "Researcher Profile" panel is *not*
 displayed. At the bottom of the page verify that there are two sections:
 
 * "Authorization groups you belong to"
